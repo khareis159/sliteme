@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-G4xxFdLYXoW5gRRMnaKPLoH/EvDjgxdFXdjAfRtT6Bk=' https://unpkg.com; style-src 'sha256-XuDO2aIiQ3GClsIiwxDSDI8YaoEHkYT7a3yPXx+Uy8g=' https://unpkg.com; img-src 'self' blob: data: https://*.tile.openstreetmap.org https://unpkg.com; media-src blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Sliteme 8.2 — Arca Offline</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--soft:#eaeef4;--tx:#1d2433;--tx2:#5b6578;--bd:#d5dbe6;--ac:#3b6fd4;--ok:#157f3b;--okbg:#e3f6e9;--bad:#c0392b;--badbg:#fdeaea;--warn:#a16207;--warnbg:#fff4d6;--sh:0 2px 10px rgba(0,0,0,.07)}
+[data-theme="dark"]{--bg:#12161f;--card:#1a2030;--soft:#252d42;--tx:#e8ecf5;--tx2:#9aa6bf;--bd:#34405c;--ac:#6c9bff;--ok:#4cd07d;--okbg:#17372a;--bad:#ff7b6b;--badbg:#3d1f24;--warn:#f1c453;--warnbg:#3a3118;--sh:0 2px 10px rgba(0,0,0,.35)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5;font-size:15px}
+.wrap{max-width:1000px;margin:0 auto;padding:14px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+header h1{font-size:1.25em}header small{color:var(--tx2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;background:var(--card);padding:6px;border-radius:12px;box-shadow:var(--sh);margin-bottom:14px}
+.tab{flex:1;min-width:100px;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font-weight:600;cursor:pointer;font-size:.92em}
+.tab.active{background:var(--ac);color:#fff}
+.panel{display:none;background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--sh);margin-bottom:14px}.panel.active{display:block}
+h2{font-size:1.1em;margin-bottom:10px}h3{font-size:1em;margin:14px 0 8px}
+label{display:block;font-size:.85em;color:var(--tx2);margin:8px 0 3px;font-weight:600}
+input,textarea,select{width:100%;padding:9px 11px;border:1.5px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{min-height:80px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:.85em}
+input[type=checkbox]{width:auto}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+button{padding:9px 15px;border:0;border-radius:8px;background:var(--ac);color:#fff;cursor:pointer;font:inherit;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.sec{background:var(--soft);color:var(--tx)}button.dng{background:var(--bad);color:#fff}button.sm{padding:5px 10px;font-size:.85em}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mt8{margin-top:8px}
+.hint{font-size:.85em;color:var(--tx2);margin-top:6px}
+.msg{padding:9px 12px;border-radius:8px;margin:10px 0;font-size:.9em;background:var(--soft)}
+.msg.warn{background:var(--warnbg);color:var(--warn)}.msg.err{background:var(--badbg);color:var(--bad)}.msg.ok{background:var(--okbg);color:var(--ok)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:var(--soft);padding:5px 11px;border-radius:20px;font-size:.88em;font-weight:600}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.bad{background:var(--badbg);color:var(--bad)}.chip.warn{background:var(--warnbg);color:var(--warn)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0}
+.card{background:var(--bg);border-radius:10px;padding:10px;text-align:center;border-top:3px solid var(--ac);word-break:break-all}
+.card b{display:block;font-size:1.05em}.card span{font-size:.8em;color:var(--tx2)}
+.fb{background:var(--bg);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid var(--ac)}
+.fb h4{font-size:.95em;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:.72em;padding:2px 8px;border-radius:10px;background:var(--soft);color:var(--tx2);font-weight:700;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-size:.88em;margin-top:8px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}th{background:var(--soft);font-size:.82em}
+.scroll{overflow-x:auto}
+.phrase{font-family:ui-monospace,Consolas,monospace;font-size:1.05em;font-weight:700;background:var(--warnbg);color:var(--warn);padding:12px;border-radius:8px;word-spacing:.3em;line-height:1.9;margin:8px 0;user-select:all}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bd);margin-right:6px}.dot.on{background:var(--ok)}.dot.mid{background:var(--warn)}
+.conv{display:grid;grid-template-columns:240px 1fr;gap:12px}
+@media(max-width:700px){.conv{grid-template-columns:1fr}}
+.cl{display:flex;flex-direction:column;gap:4px;max-height:280px;overflow:auto}
+.ci{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);padding:8px 10px;border-radius:8px;border:1.5px solid transparent}
+.ci.active{border-color:var(--ac)}
+.msgs{height:340px;overflow-y:auto;background:var(--bg);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:85%;padding:7px 10px;border-radius:10px;background:var(--card);border:1px solid var(--bd);word-break:break-word;white-space:pre-wrap}
+.m.out{align-self:flex-end;background:var(--okbg);border-color:var(--ok)}
+.m small{display:block;color:var(--tx2);font-size:.72em;margin-top:2px;white-space:normal}
+.m img,.m audio,.m video{max-width:100%;border-radius:6px;margin-top:4px;display:block}
+.m a{color:var(--ac)}
+.post{border-left:3px solid var(--ac);padding:6px 10px;margin:10px 0;background:var(--bg);border-radius:6px;word-break:break-word}
+.post p{margin:2px 0}.post ul{margin:4px 0 4px 20px}.post code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:ui-monospace,Consolas,monospace}
+.mapbox{height:260px;border-radius:10px;margin-top:8px;border:1px solid var(--bd)}
+footer{background:var(--card);padding:14px;text-align:center;border-radius:12px;color:var(--tx2);font-size:.88em;box-shadow:var(--sh);display:flex;flex-direction:column;gap:8px;align-items:center}
+#toast{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:60}
+.t{background:var(--tx);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:.9em;max-width:320px;box-shadow:var(--sh)}
+.t.error{background:var(--bad);color:#fff}.t.success{background:var(--ok);color:#fff}
+details summary{cursor:pointer;color:var(--tx2);font-size:.88em;margin-top:8px}
+[hidden]{display:none!important}
+@media(max-width:560px){.wrap{padding:8px}.panel{padding:12px}.tab{min-width:84px;font-size:.82em}}
+/* ▼▼▼ REFATORADO — B7: banner de estado de conexão */
+.conn-banner{padding:6px 10px;border-radius:8px;font-size:.82em;margin:6px 0;background:var(--soft);color:var(--tx2);font-weight:600;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.conn-banner.ok{background:var(--okbg);color:var(--ok)}
+.conn-banner.warn{background:var(--warnbg);color:var(--warn)}
+.conn-banner.bad{background:var(--badbg);color:var(--bad)}
+.conn-banner button{padding:3px 9px;font-size:.78em}
+/* ▲▲▲ REFATORADO */
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><h1>🛡️ Sliteme 8.2 <small>· Arca Offline</small></h1><small>Mensagens P2P cifradas · tudo fica neste aparelho · sem servidor</small></div><button class="sec" id="btn-theme" data-act="theme">🌙 Tema</button></header>
+<div class="tabs" id="tabs">
+<button class="tab active" data-tab="cofre">🔐 Cofre</button>
+<button class="tab" data-tab="conn">🔗 Conexões</button>
+<button class="tab" data-tab="conv">💬 Conversas</button>
+<button class="tab" data-tab="mural">🧱 Mural</button>
+<button class="tab" data-tab="local">📍 Local</button>
+<button class="tab" data-tab="backup">💾 Backup</button>
+<button class="tab" data-tab="sobre">ℹ️ Sobre</button>
+</div>
+
+<!-- COFRE -->
+<section class="panel active" id="p-cofre">
+<h2>Cofre local</h2>
+<div id="vault-new" hidden>
+<div class="msg">Primeiro uso: crie o seu cofre. A frase-chave e o PIN abrem o cofre; sem eles ninguém lê os dados, nem você.</div>
+<label for="v-name">Seu nome (aparece para quem você conectar)</label><input id="v-name" maxlength="40" autocomplete="off">
+<div class="row"><div><label for="v-pin">PIN (4 a 12 dígitos; recomendado 6 ou mais)</label><input id="v-pin" type="password" inputmode="numeric" autocomplete="new-password"></div>
+<div><label for="v-pin2">Repita o PIN</label><input id="v-pin2" type="password" inputmode="numeric" autocomplete="new-password"></div></div>
+<div class="btns"><button id="v-gen" data-act="v-gen">🎲 Gerar frase-chave</button></div>
+<div id="v-phrase-box" hidden>
+<div class="phrase" id="v-phrase"></div>
+<div class="msg warn">Anote estas 17 palavras em papel, na ordem. Não há como recuperá-las. Não tire foto e não envie por mensagem.</div>
+<label><input type="checkbox" id="v-ack"> Anotei a frase-chave em papel</label>
+<div class="btns"><button id="v-create" data-act="v-create" disabled>✅ Criar cofre</button></div>
+</div>
+<details><summary>Restaurar de um backup</summary>
+<label for="r-file">Arquivo de backup (.slm8)</label><input id="r-file" type="file" accept=".slm8,.json">
+<label for="r-phrase">Frase-chave do backup</label><textarea id="r-phrase" rows="2"></textarea>
+<label for="r-pin">PIN do backup</label><input id="r-pin" type="password" inputmode="numeric" autocomplete="off">
+<div class="btns"><button class="sec" data-act="restore">📥 Restaurar backup</button></div>
+</details>
+</div>
+<div id="vault-lock" hidden>
+<div class="msg">Cofre bloqueado. Digite a frase-chave e o PIN.</div>
+<label for="u-phrase">Frase-chave (17 palavras)</label><textarea id="u-phrase" rows="2" autocomplete="off" spellcheck="false"></textarea>
+<label for="u-pin">PIN</label><input id="u-pin" type="password" inputmode="numeric" autocomplete="current-password">
+<div class="btns"><button id="u-go" data-act="unlock">🔓 Destravar</button></div>
+<div id="u-msg"></div>
+<details><summary>Restaurar de um backup (substitui o cofre deste aparelho)</summary>
+<label for="r2-file">Arquivo de backup (.slm8)</label><input id="r2-file" type="file" accept=".slm8,.json">
+<label for="r2-phrase">Frase-chave do backup</label><textarea id="r2-phrase" rows="2"></textarea>
+<label for="r2-pin">PIN do backup</label><input id="r2-pin" type="password" inputmode="numeric" autocomplete="off">
+<div class="btns"><button class="sec" data-act="restore2">📥 Restaurar backup</button></div>
+</details>
+</div>
+<div id="vault-open" hidden>
+<div class="cards"><div class="card"><b id="o-name"></b><span>seu nome</span></div><div class="card"><b id="o-fp"></b><span>seu ID curto</span></div></div>
+<label for="me-card">Seu cartão de contato (envie para quem quer falar com você)</label>
+<textarea id="me-card" readonly rows="3"></textarea>
+<div class="btns"><button class="sec" data-act="copy-card">📋 Copiar cartão</button><button class="sec" data-act="lock">🔒 Bloquear</button><button class="dng" data-act="panic">🚨 Pânico (apagar tudo)</button></div>
+<div class="hint">O cartão contém só chaves públicas e o nome. Bloqueia sozinho após 15 minutos sem uso (2 horas se houver conversa ativa).</div>
+</div>
+</section>
+
+<!-- CONEXÕES -->
+<section class="panel" id="p-conn">
+<h2>Conexões diretas (WebRTC)</h2>
+<div class="lockmsg msg warn" hidden>Destrave o cofre na aba 🔐 Cofre.</div>
+<div class="body">
+<div class="msg">Duas pessoas trocam um <b>convite</b> e uma <b>resposta</b> (texto) por qualquer meio. Depois o canal é direto entre os aparelhos. As duas precisam estar online ao mesmo tempo.</div>
+<label for="ice-mode">Caminho de rede</label>
+<select id="ice-mode"><option value="lan">Somente rede local (sem servidor externo)</option><option value="stun">Com STUN do Google (para redes diferentes)</option><option value="custom">STUN personalizado</option></select>
+<input id="ice-custom" placeholder="stun:meu.servidor:3478" hidden>
+<div class="hint">STUN revela seu IP público ao servidor STUN. A conexão direta revela seu IP ao outro participante. Se o outro aparelho ficar sem responder, a conversa fica em espera e volta sozinha quando ele responder.</div>
+<div class="btns"><button data-act="c-offer">➕ Criar convite</button><button class="sec" data-act="c-accept">📥 Aceitar convite</button></div>
+<div id="conn-list"></div>
+</div>
+</section>
+
+<!-- CONVERSAS -->
+<section class="panel" id="p-conv">
+<h2>Conversas</h2>
+<div class="lockmsg msg warn" hidden>Destrave o cofre na aba 🔐 Cofre.</div>
+<div class="body conv">
+<div>
+<div class="cl" id="cv-list"></div>
+<details><summary>➕ Adicionar contato</summary>
+<label for="ct-in">Cole o cartão de contato</label><textarea id="ct-in" rows="3"></textarea>
+<div class="btns"><button class="sm" data-act="ct-add">Adicionar</button></div></details>
+<details><summary>🛡️ Círculos</summary>
+<label for="ci-name">Nome do novo círculo</label><input id="ci-name" maxlength="40">
+<div class="btns"><button class="sm" data-act="ci-new">Criar círculo</button></div>
+<label for="ci-join">Ou cole um convite de círculo</label><textarea id="ci-join" rows="3"></textarea>
+<div class="btns"><button class="sm sec" data-act="ci-join">Entrar no círculo</button></div></details>
+</div>
+<div>
+<div id="cv-head" class="hint">Escolha um contato ou círculo.</div>
+<!-- ▼▼▼ REFATORADO — B7: banner de estado da conexão -->
+<div id="cv-banner"></div>
+<!-- ▲▲▲ REFATORADO -->
+<div id="cv-info"></div>
+<div class="msgs" id="cv-msgs" aria-live="polite"></div>
+<div class="row mt8"><input id="cv-text" placeholder="Mensagem" maxlength="4000" autocomplete="off" disabled></div>
+<div class="btns"><button id="cv-send" data-act="cv-send" disabled>Enviar</button><button class="sec" id="cv-attach" data-act="cv-attach" disabled>📎 Arquivo</button><button class="sec" id="cv-mic" data-act="cv-mic" disabled>🎙️ Áudio</button><button class="sec" id="cv-loc" data-act="cv-loc" disabled>📍 Local</button></div>
+<input type="file" id="cv-file" hidden>
+<div class="hint" id="cv-note"></div>
+</div>
+</div>
+</section>
+
+<!-- MURAL -->
+<section class="panel" id="p-mural">
+<h2>Mural (notas cifradas neste aparelho)</h2>
+<div class="lockmsg msg warn" hidden>Destrave o cofre na aba 🔐 Cofre.</div>
+<div class="body">
+<label for="mu-in">Nova nota (suporta **negrito**, *itálico*, `código`, links e listas com "- ")</label>
+<textarea id="mu-in" rows="4" maxlength="8000"></textarea>
+<div class="btns"><button data-act="mu-post">Publicar</button></div>
+<div id="mu-list"></div>
+</div>
+</section>
+
+<!-- LOCAL -->
+<section class="panel" id="p-local">
+<h2>Localização</h2>
+<div class="lockmsg msg warn" hidden>Destrave o cofre na aba 🔐 Cofre.</div>
+<div class="body">
+<label for="lo-prec">Precisão</label>
+<select id="lo-prec"><option value="5">Exata (cerca de 1 m)</option><option value="3" selected>Aproximada (cerca de 100 m)</option><option value="1">Cidade (cerca de 10 km)</option></select>
+<div class="btns"><button data-act="lo-get">📍 Obter minha localização</button><button class="sec" data-act="lo-map">🗺️ Carregar mapa (online)</button></div>
+<div id="lo-out" class="hint">Sem localização ainda. O navegador vai pedir permissão.</div>
+<div id="lo-map" class="mapbox" hidden></div>
+<div class="hint">O mapa é opcional e só carrega se você clicar. Ele busca o Leaflet e as imagens do OpenStreetMap, que veem seu IP e a área consultada. Sem internet, o app mostra as coordenadas e links.</div>
+</div>
+</section>
+
+<!-- BACKUP -->
+<section class="panel" id="p-backup">
+<h2>Backup e diagnóstico</h2>
+<div class="lockmsg msg warn" hidden>Destrave o cofre na aba 🔐 Cofre.</div>
+<div class="body">
+<h3>Exportar backup cifrado</h3>
+<label><input type="checkbox" id="bk-media" checked> Incluir arquivos e áudios (pode ficar grande)</label>
+<div class="btns"><button data-act="bk-exp">📤 Exportar backup (.slm8)</button></div>
+<div class="hint">O backup só abre com a mesma frase-chave e o mesmo PIN. Guarde em pelo menos dois lugares.</div>
+<h3>Diagnóstico</h3>
+<div class="btns"><button class="sec" data-act="dg-run">🔎 Rodar diagnóstico</button><button class="sec" data-act="dg-persist">🧷 Pedir armazenamento persistente</button></div>
+<div id="dg-out"></div>
+</div>
+</section>
+
+<!-- SOBRE -->
+<section class="panel" id="p-sobre">
+<h2>Sobre o Sliteme 8.2</h2>
+<div class="msg warn">A criptografia usa recursos padrão do navegador (WebCrypto), mas o protocolo é próprio e <b>não foi auditado por terceiros</b>. Para riscos graves, prefira um aplicativo auditado.</div>
+<div class="scroll"><table><thead><tr><th>Recurso</th><th>Situação</th><th>Observação</th></tr></thead><tbody>
+<tr><td>Cofre local (frase-chave + PIN)</td><td>✅ Funciona</td><td>PBKDF2-SHA256 com 600 mil iterações; AES-GCM de 256 bits.</td></tr>
+<tr><td>Chat direto cifrado</td><td>✅ Funciona</td><td>ECDH P-256 + AES-GCM, mensagens assinadas (ECDSA). As duas pessoas precisam estar online juntas.</td></tr>
+<tr><td>Mensagens pendentes</td><td>✅ Fila local</td><td>Ficam guardadas e são reenviadas na próxima conexão. Não há servidor que guarde mensagens.</td></tr>
+<tr><td>Círculos (grupos)</td><td>✅ Funciona</td><td>Chave compartilhada por convite; texto e localização; as mensagens são repassadas entre as conexões abertas.</td></tr>
+<tr><td>Arquivos e áudio</td><td>✅ Só em conversa direta</td><td>Pedaços de 32 KB cifrados, até 256 MB.</td></tr>
+<tr><td>Keep-alive com detecção de queda</td><td>✅ Novo em 8.1</td><td>Ping+pong a cada 8 s; alarme após 45 s sem resposta.</td></tr>
+<tr><td>ICE connectionstatechange</td><td>✅ Novo em 8.1</td><td>Detecta disconnected/failed em tempo real; permite recuperação.</td></tr>
+<tr><td>Coleta de candidatos ICE ampliada</td><td>✅ Novo em 8.1</td><td>De 6 s para 12 s; encerra ao candidato nulo.</td></tr>
+<tr><td>Auto-lock estendido com chat ativo</td><td>✅ Novo em 8.1</td><td>2 h em vez de 15 min quando há conexão aberta.</td></tr>
+<tr><td>Uptime e renovação de conexão</td><td>✅ Novo em 8.1</td><td>Mostra tempo conectado e permite renovar convite.</td></tr>
+<tr><td>Retomada de arquivo interrompido</td><td>✅ Novo em 8.2</td><td>Ao reconectar, o receptor pede só os pedaços que faltam.</td></tr>
+<tr><td>Queda sem encerrar na hora</td><td>✅ Novo em 8.2</td><td>Sem resposta por 45 s vira "em espera"; só encerra após 10 min.</td></tr>
+<tr><td>Limpeza de recepções órfãs</td><td>✅ Novo em 8.1</td><td>Recepção sem atividade há 5 min é pausada e marcada; o progresso fica salvo.</td></tr>
+<tr><td>Mapa</td><td>🟡 Opcional, online</td><td>Só carrega se você clicar.</td></tr>
+<tr><td>Backup e restauração</td><td>✅ Funciona</td><td>Arquivo .slm8 cifrado.</td></tr>
+<tr><td>Sigilo futuro (forward secrecy)</td><td>❌ Não tem</td><td>Se uma chave de identidade vazar, mensagens antigas capturadas podem ser lidas.</td></tr>
+<tr><td>Anonimato de rede</td><td>❌ Não tem</td><td>O outro participante vê seu IP.</td></tr>
+<tr><td>Nostr, Yjs (CRDT) e IPFS</td><td>❌ Não existem</td><td>Foram retirados das promessas; veja a cartilha.</td></tr>
+<tr><td>QR code</td><td>❌ Não existe</td><td>Convites e respostas são texto.</td></tr>
+</tbody></table></div>
+</section>
+
+<footer><div id="foot-txt"></div><button class="sec sm" data-act="copy-pix">📋 Copiar chave Pix</button></footer>
+</div>
+<div id="toast"></div>
+<script>
+
+
+'use strict';
+// ============ CONSTANTES ============
+// ▼▼▼ REFATORADO — B1/B3/B4/B6: novas constantes do plano 8.1
+const VERSION = '8.2', DB_NAME = 'sliteme8', THEME_KEY = 'sliteme_theme', PIX = '61999487649';
+const FOOTER_TEXT = 'Carlos Alberto Reis 2026 - Apoio chave Pix 61999487649';
+const KDF_ITER = 600000, CHUNK = 32768, MAX_FILE = 256 * 1024 * 1024;
+const AUTOLOCK_MS = 15 * 60 * 1000;
+const ACTIVE_CONN_AUTOLOCK_MS = 2 * 60 * 60 * 1000; // 2 h com conexão ativa
+const PING_INTERVAL_MS = 8000;
+const PONG_TIMEOUT_MS = 45000;
+const HEALTH_CHECK_MS = 15000;
+const INBOUND_TIMEOUT_MS = 5 * 60 * 1000; // sem atividade
+const STALE_CLOSE_MS = 10 * 60 * 1000; // sem resposta: só então encerra
+const ICE_GATHER_TIMEOUT_MS = 12000;
+// ▲▲▲ REFATORADO
+const WORDS = 'abelha acordo agua aguia alvo amigo anel arroz asa aviao bala balde banco barco bolo bota braco brisa burro cabra cacto cais calor campo canoa capa carro casa cerca chave chuva cinto circo cisne clima coco coelho colar corda corvo costa cravo cubo dado dente dedo disco doce duna ecos escada espada estrela fada faixa farol faca feira ferro festa fio flauta flor fogo folha forno fruta fumo gaita gato gelo giz globo goma grade gruta horta ilha jarro jogo juiz lago lamina lapis leao leite lenha lesma livro lobo lua luva maca mala mapa mar mel mesa moeda monte muro navio neve ninho noite nuvem oceano onda ouro ovelha padaria palma panela pao parque pedra peixe pena pente pera piano pipa planta poco ponte porta prato praia pulso queijo rede relogio rio roda rosa sabao sal sapo selva sino sol sombra sopa tapete tarde tigre tinta toalha tocha trigo trilha tubo uva vaca vale vela vento verde vidro vila vinho voz zebra abrigo aldeia altar amora andaime anzol arvore atlas aurora balsa barata bule cabine calca canto casco cedro cereja cesta cinza clave cobre coral cruz dardo delta dique ermo espiga fonte forja furo galho garfo geada gota grao hera jaca janela jardim lacre lampada lanca lenco linha lume manga mastro mirante moinho mola musgo nata oasis ostra pampa pasto pilha pluma polen pomar pote prado prumo quadro rampa raiz regua remo rocha rolha sacola safira selo serra silo tabua talha tecido tenda terra tijolo tomada torre trave trena trote tulipa urso vagao varal velho'.split(' ');
+const LEAFLET = { js: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', jsSri: 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=', css: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', cssSri: 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=' };
+
+// ============ UTILIDADES ============
+const encT = new TextEncoder(), decT = new TextDecoder();
+const $ = id => document.getElementById(id);
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k === 'value' || k === 'disabled' || k === 'hidden' || k === 'readOnly' || k === 'checked') e[k] = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+  }
+  kids.flat().forEach(c => { if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c))); });
+  return e;
+}
+const clear = e => { while (e.firstChild) e.removeChild(e.firstChild); };
+const b64e = u8 => { let s = ''; const C = 0x8000; for (let i = 0; i < u8.length; i += C) s += String.fromCharCode.apply(null, u8.subarray(i, i + C)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+const b64d = s => { if (typeof s !== 'string' || /[^A-Za-z0-9_-]/.test(s)) throw new Error('base64 inválido'); s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+const hex = u8 => [...u8].map(b => b.toString(16).padStart(2, '0')).join('');
+const cat = (...a) => { const o = new Uint8Array(a.reduce((s, x) => s + x.length, 0)); let p = 0; a.forEach(x => { o.set(x, p); p += x.length; }); return o; };
+const sha = async d => new Uint8Array(await crypto.subtle.digest('SHA-256', typeof d === 'string' ? encT.encode(d) : d));
+const fmtBytes = n => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+const isStr = (v, max = 200) => typeof v === 'string' && v.length <= max;
+const cleanName = s => String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, 40);
+const safeFile = s => String(s == null ? 'arquivo' : s).replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 120) || 'arquivo';
+function notify(msg, type = '') { const t = h('div', { class: 't ' + type, text: msg }); $('toast').append(t); setTimeout(() => t.remove(), 4500); }
+function guard(fn) { return async (...a) => { try { await fn(...a); } catch (e) { notify('❌ ' + (e && e.message || e), 'error'); } }; }
+async function copyText(s, ok = '📋 Copiado') {
+  try { await navigator.clipboard.writeText(s); notify(ok, 'success'); }
+  catch (e) { const t = h('textarea', { readOnly: true }); t.value = s; document.body.append(t); t.select(); let r = false; try { r = document.execCommand('copy'); } catch (x) {} t.remove(); notify(r ? ok : 'Copie manualmente o texto', r ? 'success' : 'error'); }
+}
+
+// ============ CRIPTOGRAFIA ============
+const normPhrase = p => String(p).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().split(/\s+/).join(' ');
+async function genPhrase() {
+  const bytes = rnd(16), w = [...bytes].map(b => WORDS[b]);
+  w.push(WORDS[(await sha(bytes))[0]]);
+  return w.join(' ');
+}
+async function checkPhrase(p) {
+  const w = normPhrase(p).split(' ');
+  if (w.length !== 17) return 'A frase-chave tem 17 palavras.';
+  const idx = w.map(x => WORDS.indexOf(x));
+  if (idx.includes(-1)) return `Palavra desconhecida: "${w[idx.indexOf(-1)]}".`;
+  if ((await sha(Uint8Array.from(idx.slice(0, 16))))[0] !== idx[16]) return 'A última palavra não confere: há um erro de digitação.';
+  return null;
+}
+async function deriveKeys(phrase, pin, salt, iter) {
+  const base = await crypto.subtle.importKey('raw', encT.encode(normPhrase(phrase) + '\u0000' + pin), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: iter }, base, 256);
+  const hk = await crypto.subtle.importKey('raw', bits, 'HKDF', false, ['deriveKey']);
+  const mk = info => crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: encT.encode(info) }, hk, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  return { store: await mk('sliteme8-store'), backup: await mk('sliteme8-backup') };
+}
+const ad = aad => aad ? { additionalData: encT.encode(aad) } : {};
+async function seal(key, obj, aad) { const iv = rnd(12); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, ...ad(aad) }, key, encT.encode(JSON.stringify(obj)))); return { iv: b64e(iv), ct: b64e(ct) }; }
+async function open(key, e, aad) { if (!e || !isStr(e.iv, 64) || typeof e.ct !== 'string') throw new Error('registro inválido'); return JSON.parse(decT.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(e.iv), ...ad(aad) }, key, b64d(e.ct)))); }
+async function sealBytes(key, u8, aad) { const iv = rnd(12); return { iv, ct: new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, ...ad(aad) }, key, u8)) }; }
+async function openBytes(key, r, aad) { return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: r.iv, ...ad(aad) }, key, r.ct)); }
+const fpOf = async (e, s) => hex(await sha(cat(b64d(e), b64d(s))));
+async function safetyNumber(fpA, fpB) {
+  const d = await sha([fpA, fpB].sort().join('|')), out = [];
+  for (let i = 0; i < 6; i++) out.push(String(new DataView(d.buffer).getUint32(i * 4) % 100000).padStart(5, '0'));
+  return out.join(' ');
+}
+async function newIdentity() {
+  const ecdh = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+  const sign = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  return {
+    ecdhJwk: await crypto.subtle.exportKey('jwk', ecdh.privateKey), signJwk: await crypto.subtle.exportKey('jwk', sign.privateKey),
+    pubs: { ecdh: b64e(new Uint8Array(await crypto.subtle.exportKey('raw', ecdh.publicKey))), ecdsa: b64e(new Uint8Array(await crypto.subtle.exportKey('raw', sign.publicKey))) }
+  };
+}
+const validPub = s => { try { const u = b64d(s); return u.length === 65 && u[0] === 4; } catch (e) { return false; } };
+async function dmKey(myPriv, theirEcdh, salt) {
+  const pub = await crypto.subtle.importKey('raw', b64d(theirEcdh), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+  const bits = await crypto.subtle.deriveBits({ name: 'ECDH', public: pub }, myPriv, 256);
+  const hk = await crypto.subtle.importKey('raw', bits, 'HKDF', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt, info: encT.encode('sliteme8-dm') }, hk, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+const signStr = async str => b64e(new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, V.sign, encT.encode(str))));
+async function verifyStr(pubRaw, str, sig) {
+  try {
+    const k = await crypto.subtle.importKey('raw', b64d(pubRaw), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64d(sig), encT.encode(str));
+  } catch (e) { return false; }
+}
+const aesRaw = (u8, use) => crypto.subtle.importKey('raw', u8, 'AES-GCM', false, use || ['encrypt', 'decrypt']);
+
+// ============ ARMAZENAMENTO (IndexedDB) ============
+let db = null;
+function openDB(name = DB_NAME) {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(name, 1);
+    r.onupgradeneeded = () => {
+      const d = r.result; d.createObjectStore('meta', { keyPath: 'id' }); d.createObjectStore('contacts', { keyPath: 'id' }); d.createObjectStore('circles', { keyPath: 'id' });
+      d.createObjectStore('msgs', { keyPath: 'id' }).createIndex('conv', 'conv'); d.createObjectStore('chunks', { keyPath: 'k' }); d.createObjectStore('mural', { keyPath: 'id', autoIncrement: true });
+    };
+    r.onsuccess = () => { db = r.result; db.onversionchange = () => db.close(); res(db); };
+    r.onerror = () => rej(r.error || new Error('IndexedDB indisponível'));
+    r.onblocked = () => rej(new Error('IndexedDB bloqueado por outra aba'));
+  });
+}
+function run(stores, mode, fn) {
+  return new Promise((res, rej) => {
+    const t = db.transaction(stores, mode); let out;
+    t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transação abortada'));
+    out = fn(t);
+  }).then(async x => (x && typeof x === 'object' && 'onsuccess' in x) ? x.result : x);
+}
+const rqp = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const dbPut = (s, v) => run(s, 'readwrite', t => { t.objectStore(s).put(v); });
+const dbGet = (s, k) => new Promise((res, rej) => { const r = db.transaction(s).objectStore(s).get(k); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const dbAll = s => new Promise((res, rej) => { const r = db.transaction(s).objectStore(s).getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const dbIdx = (s, i, k) => new Promise((res, rej) => { const r = db.transaction(s).objectStore(s).index(i).getAll(k); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const dbDel = (s, k) => run(s, 'readwrite', t => { t.objectStore(s).delete(k); });
+const dbCount = s => new Promise((res, rej) => { const r = db.transaction(s).objectStore(s).count(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const dbClearAll = () => run(['meta', 'contacts', 'circles', 'msgs', 'chunks', 'mural'], 'readwrite', t => { ['meta', 'contacts', 'circles', 'msgs', 'chunks', 'mural'].forEach(s => t.objectStore(s).clear()); });
+const delChunks = fid => run('chunks', 'readwrite', t => { t.objectStore('chunks').delete(IDBKeyRange.bound(fid + ':', fid + ':\uFFFF')); });
+
+// ============ COFRE ============
+let V = null, vaultRec = null, circKeys = new Map(), fails = 0, lockedUntil = 0, lockTimer = null;
+async function loadVault(keys, rec) {
+  const chk = await open(keys.store, rec.check, 'check');
+  if (chk.ok !== 'sliteme8') throw new Error('Cofre inválido');
+  const w = await open(keys.store, rec.wrapped, 'wrapped');
+  const ecdh = await crypto.subtle.importKey('jwk', w.ecdh, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']);
+  const sign = await crypto.subtle.importKey('jwk', w.sign, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  V = { store: keys.store, backup: keys.backup, ecdh, sign, pub: rec.pubs, fp: await fpOf(rec.pubs.ecdh, rec.pubs.ecdsa), name: w.name, salt: rec.salt, iter: rec.iter };
+  circKeys = new Map();
+  for (const c of await listCircles()) circKeys.set(c.id, await aesRaw(b64d(c.key)));
+  touch();
+}
+async function createVault(name, pin, phrase) {
+  name = cleanName(name); if (!name) throw new Error('Informe seu nome.');
+  if (!/^\d{4,12}$/.test(pin)) throw new Error('O PIN deve ter de 4 a 12 dígitos.');
+  const err = await checkPhrase(phrase); if (err) throw new Error(err);
+  const salt = rnd(16), keys = await deriveKeys(phrase, pin, salt, KDF_ITER), id = await newIdentity();
+  const rec = { id: 'vault', v: 8, salt: b64e(salt), iter: KDF_ITER, check: await seal(keys.store, { ok: 'sliteme8' }, 'check'), wrapped: await seal(keys.store, { ecdh: id.ecdhJwk, sign: id.signJwk, name }, 'wrapped'), pubs: id.pubs, created: Date.now() };
+  await dbPut('meta', rec); vaultRec = rec; await loadVault(keys, rec);
+}
+async function unlockVault(phrase, pin) {
+  if (Date.now() < lockedUntil) throw new Error(`Aguarde ${Math.ceil((lockedUntil - Date.now()) / 1000)} s para tentar de novo.`);
+  const rec = vaultRec || await dbGet('meta', 'vault'); if (!rec) throw new Error('Nenhum cofre neste aparelho.');
+  try {
+    const keys = await deriveKeys(phrase, pin, b64d(rec.salt), rec.iter);
+    await loadVault(keys, rec);
+  } catch (e) {
+    V = null; fails++; lockedUntil = Date.now() + Math.min(30000, 1000 * 2 ** Math.min(fails, 5));
+    throw new Error('Frase-chave ou PIN incorretos.');
+  }
+  fails = 0; vaultRec = rec;
+}
+
+// ▼▼▼ REFATORADO — B4: lockVault com limpeza estendida de recursos
+function lockVault() {
+  closeAllConns();
+  V = null;
+  circKeys = new Map();
+  current = null;
+  clearTimeout(lockTimer);
+  renderAll();
+}
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ REFATORADO — B4: touch consciente de conexões ativas
+function touch() {
+  clearTimeout(lockTimer);
+  if (!V) return;
+  const hasActiveConns = [...conns.values()].some(c => c.authed && c.dc && c.dc.readyState === 'open');
+  const timeout = hasActiveConns ? ACTIVE_CONN_AUTOLOCK_MS : AUTOLOCK_MS;
+  lockTimer = setTimeout(() => {
+    if (V) {
+      lockVault();
+      notify('🔒 Cofre bloqueado por inatividade');
+    }
+  }, timeout);
+}
+// ▲▲▲ REFATORADO
+
+// ============ CONTATOS, CÍRCULOS, MENSAGENS ============
+const cardOf = () => 'SLC8.' + b64e(encT.encode(JSON.stringify({ n: V.name, e: V.pub.ecdh, s: V.pub.ecdsa })));
+function parseCard(t) {
+  t = String(t).trim(); if (!t.startsWith('SLC8.')) throw new Error('Cartão inválido.');
+  let o; try { o = JSON.parse(decT.decode(b64d(t.slice(5)))); } catch (e) { throw new Error('Cartão ilegível.'); }
+  if (!o || !isStr(o.n, 80) || !validPub(o.e) || !validPub(o.s)) throw new Error('Cartão inválido.');
+  return { name: cleanName(o.n) || 'Sem nome', ecdh: o.e, ecdsa: o.s };
+}
+async function saveContact(c) { await dbPut('contacts', { id: c.fp, enc: await seal(V.store, c, 'contact:' + c.fp) }); }
+async function listContacts() { const out = []; for (const r of await dbAll('contacts')) { try { out.push(await open(V.store, r.enc, 'contact:' + r.id)); } catch (e) {} } return out.sort((a, b) => a.name.localeCompare(b.name)); }
+async function getContact(fp) { const r = await dbGet('contacts', fp); if (!r) return null; try { return await open(V.store, r.enc, 'contact:' + fp); } catch (e) { return null; } }
+async function addContactCard(text) {
+  const c = parseCard(text), fp = await fpOf(c.ecdh, c.ecdsa);
+  if (fp === V.fp) throw new Error('Esse é o seu próprio cartão.');
+  const old = await getContact(fp);
+  await saveContact({ fp, name: c.name, ecdh: c.ecdh, ecdsa: c.ecdsa, verified: old ? old.verified : false, added: old ? old.added : Date.now() });
+  return fp;
+}
+async function listCircles() { const out = []; for (const r of await dbAll('circles')) { try { out.push({ id: r.id, ...(await open(V.store, r.enc, 'circle:' + r.id)) }); } catch (e) {} } return out.sort((a, b) => a.name.localeCompare(b.name)); }
+async function saveCircle(c) { await dbPut('circles', { id: c.id, enc: await seal(V.store, { name: c.name, key: c.key, created: c.created || Date.now() }, 'circle:' + c.id) }); circKeys.set(c.id, await aesRaw(b64d(c.key))); }
+async function newCircle(name) { name = cleanName(name); if (!name) throw new Error('Informe o nome do círculo.'); const c = { id: hex(rnd(8)), name, key: b64e(rnd(32)) }; await saveCircle(c); return c.id; }
+const inviteOf = c => 'SLI8.' + b64e(encT.encode(JSON.stringify({ i: c.id, n: c.name, k: c.key })));
+async function joinCircle(text) {
+  text = String(text).trim(); if (!text.startsWith('SLI8.')) throw new Error('Convite inválido.');
+  let o; try { o = JSON.parse(decT.decode(b64d(text.slice(5)))); } catch (e) { throw new Error('Convite ilegível.'); }
+  if (!o || !/^[0-9a-f]{16}$/.test(o.i) || !isStr(o.n, 80) || !isStr(o.k, 60)) throw new Error('Convite inválido.');
+  let kb; try { kb = b64d(o.k); } catch (e) { kb = null; } if (!kb || kb.length !== 32) throw new Error('Convite inválido.');
+  const old = (await listCircles()).find(c => c.id === o.i);
+  await saveCircle({ id: o.i, name: cleanName(o.n) || 'Círculo', key: o.k, created: old && old.created }); return o.i;
+}
+async function msgPut(m) { await dbPut('msgs', { id: m.id, conv: m.conv, ts: m.ts, dir: m.dir, st: m.st, enc: await seal(V.store, m.body, 'msg:' + m.id) }); }
+const msgDecode = async r => ({ id: r.id, conv: r.conv, ts: r.ts, dir: r.dir, st: r.st, body: await open(V.store, r.enc, 'msg:' + r.id) });
+async function msgGet(id) { const r = await dbGet('msgs', id); return r ? msgDecode(r) : null; }
+async function msgList(conv) { const out = []; for (const r of await dbIdx('msgs', 'conv', conv)) { try { out.push(await msgDecode(r)); } catch (e) {} } return out.sort((a, b) => a.ts - b.ts); }
+async function msgState(id, st) { const m = await msgGet(id); if (m && m.st !== st) { m.st = st; await msgPut(m); } }
+async function msgBody(id, fn) { const m = await msgGet(id); if (m) { fn(m.body); await msgPut(m); } }
+async function delConv(conv) {
+  for (const r of await dbIdx('msgs', 'conv', conv)) { try { const m = await msgDecode(r); if (m.body.fid) await delChunks(m.body.fid); } catch (e) {} await dbDel('msgs', r.id); }
+}
+
+// ============ ARQUIVOS (pedaços cifrados em repouso) ============
+async function storeLocalFile(file) {
+  if (file.size > MAX_FILE) throw new Error('Arquivo maior que 256 MB.');
+  if (file.size === 0) throw new Error('Arquivo vazio.');
+  const fid = hex(rnd(8)), kf = b64e(rnd(32)), n = Math.ceil(file.size / CHUNK);
+  for (let i = 0; i < n; i++) {
+    const u8 = new Uint8Array(await readBlob(file.slice(i * CHUNK, (i + 1) * CHUNK)));
+    const s = await sealBytes(V.store, u8, `chunk:${fid}:${i}`);
+    await dbPut('chunks', { k: `${fid}:${i}`, iv: s.iv, ct: s.ct });
+  }
+  return { fid, kf, n, size: file.size, name: safeFile(file.name), mime: String(file.type || '').slice(0, 80) };
+}
+function readBlob(b) { if (b.arrayBuffer) return b.arrayBuffer(); return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsArrayBuffer(b); }); }
+async function chunkGet(fid, i) { const r = await dbGet('chunks', `${fid}:${i}`); return r ? openBytes(V.store, r, `chunk:${fid}:${i}`) : null; }
+async function fileComplete(body) { const have = await run('chunks', 'readonly', t => t.objectStore('chunks').count(IDBKeyRange.bound(body.fid + ':', body.fid + ':\uFFFF'))); return have === body.n; }
+async function assembleFile(body) {
+  const parts = []; for (let i = 0; i < body.n; i++) { const u = await chunkGet(body.fid, i); if (!u) throw new Error('Arquivo incompleto.'); parts.push(u); }
+  const safe = /^(image\/(png|jpeg|gif|webp)|audio\/(webm|ogg|mp4|mpeg|wav|x-wav)|video\/(mp4|webm))/.test(body.mime);
+  return { blob: new Blob(parts, { type: safe ? body.mime : 'application/octet-stream' }), inline: safe };
+}
+const chunkIV = (fid, i) => { const iv = new Uint8Array(12); for (let j = 0; j < 4; j++) iv[j] = parseInt(fid.substr(j * 2, 2), 16); new DataView(iv.buffer).setUint32(8, i); return iv; };
+function validFileBody(b) {
+  return b && /^[0-9a-f]{16}$/.test(b.fid) && Number.isInteger(b.size) && b.size > 0 && b.size <= MAX_FILE && b.n === Math.ceil(b.size / CHUNK) && isStr(b.kf, 60) && isStr(b.name, 200) && isStr(b.mime, 80);
+}
+
+// ============ MARKDOWN MÍNIMO (sem innerHTML) ============
+function safeUrl(u) { try { const x = new URL(u); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : null; } catch (e) { return null; } }
+function mdInline(text) {
+  const frag = document.createDocumentFragment(), re = /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|https?:\/\/[^\s<>"']+)/g; let last = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > last) frag.append(text.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith('**')) frag.append(h('b', { text: t.slice(2, -2) }));
+    else if (t.startsWith('*')) frag.append(h('i', { text: t.slice(1, -1) }));
+    else if (t.startsWith('`')) frag.append(h('code', { text: t.slice(1, -1) }));
+    else { const u = safeUrl(t); frag.append(u ? h('a', { href: u, target: '_blank', rel: 'noopener noreferrer nofollow', text: t }) : t); }
+    last = m.index + t.length;
+  }
+  if (last < text.length) frag.append(text.slice(last));
+  return frag;
+}
+function mdRender(text) {
+  const root = document.createDocumentFragment(); let ul = null;
+  String(text).split('\n').forEach(line => {
+    const li = /^\s*[-*]\s+(.*)$/.exec(line);
+    if (li) { if (!ul) { ul = h('ul'); root.append(ul); } ul.append(h('li', null, mdInline(li[1]))); }
+    else { ul = null; if (line.trim()) root.append(h('p', null, mdInline(line))); }
+  });
+  return root;
+}
+
+// ============ FIM DA PARTE 2/3 — CONTINUA EM PARTE 3/3 ============
+
+
+// ============ CONEXÕES WEBRTC ============
+const conns = new Map(); let connSeq = 0; const inbound = new Map();
+const iceServers = () => { const m = $('ice-mode').value; if (m === 'stun') return [{ urls: 'stun:stun.l.google.com:19302' }]; if (m === 'custom') { const u = $('ice-custom').value.trim(); if (!/^stuns?:[\w.\-]+(:\d+)?$/.test(u)) throw new Error('STUN inválido.'); return [{ urls: u }]; } return []; };
+async function packSignal(desc) {
+  // Sempre sem compactação: navegadores Android antigos não descompactam 'deflate-raw'.
+  return 'SLM8.r' + b64e(encT.encode(JSON.stringify({ t: desc.type, s: desc.sdp })));
+}
+async function unpackSignal(text, expect) {
+  text = String(text).trim(); const m = /^SLM8\.([rz])([A-Za-z0-9_-]+)$/.exec(text); if (!m) throw new Error('Código de conexão inválido.');
+  let raw = b64d(m[2]);
+  if (m[1] === 'z') { let ds; try { ds = new DecompressionStream('deflate-raw'); } catch (e) { throw new Error('Este código veio compactado e este navegador não consegue ler. Gere o convite de novo com a versão atual do app.'); } const w = ds.writable.getWriter(); w.write(raw); w.close(); raw = new Uint8Array(await new Response(ds.readable).arrayBuffer()); }
+  if (raw.length > 60000) throw new Error('Código grande demais.');
+  let o; try { o = JSON.parse(decT.decode(raw)); } catch (e) { throw new Error('Código ilegível.'); }
+  if (!o || o.t !== expect || !isStr(o.s, 50000)) throw new Error(expect === 'offer' ? 'Isso não é um convite.' : 'Isso não é uma resposta.');
+  return { type: o.t, sdp: o.s };
+}
+
+// ▼▼▼ REFATORADO — B2: waitIce ampliado (12 s) com saída por candidato nulo
+function waitIce(pc, ms = ICE_GATHER_TIMEOUT_MS) {
+  return new Promise((resolve, reject) => {
+    let timer = null, finished = false;
+    const cleanup = () => {
+      if (timer) clearTimeout(timer);
+      pc.removeEventListener('icegatheringstatechange', check);
+      pc.removeEventListener('icecandidate', candidate);
+      pc.removeEventListener('iceconnectionstatechange', checkFailure);
+      pc.removeEventListener('connectionstatechange', checkFailure);
+    };
+    const finish = (err = null) => {
+      if (finished) return;
+      finished = true; cleanup();
+      if (err) reject(err); else resolve();
+    };
+    const check = () => { if (pc.iceGatheringState === 'complete') finish(); };
+    const candidate = e => { if (!e.candidate) finish(); };
+    const checkFailure = () => {
+      if (pc.iceConnectionState === 'failed' || pc.connectionState === 'failed') {
+        finish(new Error('A coleta ICE falhou antes de concluir. Tente STUN ou outra rede.'));
+      }
+    };
+    if (pc.iceGatheringState === 'complete') return finish();
+    pc.addEventListener('icegatheringstatechange', check);
+    pc.addEventListener('icecandidate', candidate);
+    pc.addEventListener('iceconnectionstatechange', checkFailure);
+    pc.addEventListener('connectionstatechange', checkFailure);
+    // Recheck after installing listeners to close the state-change race.
+    check(); checkFailure();
+    timer = setTimeout(() => finish(), ms);
+  });
+}
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ REFATORADO — B1: classe Conn com ciclo de vida, ping/pong, health check e ICE state
+class Conn {
+  constructor(role) {
+    this.id = ++connSeq; this.role = role; this.state = 'preparando'; this.remote = null; this.authed = false;
+    this.q = Promise.resolve(); this.nonce = b64e(rnd(16)); this.out = ''; this.err = '';
+    this.verified = false; this.stale = false; this.sending = new Set();
+    this.createdAt = Date.now(); this.connectedAt = 0; this.lastPong = 0; this.lastPing = 0; this.iceState = '';
+    this.pc = new RTCPeerConnection({ iceServers: iceServers() }); this.dc = null;
+    this.pc.addEventListener('connectionstatechange', () => {
+      const s = this.pc.connectionState;
+      this.state = s === 'disconnected' ? 'instável (tentando recuperar)' : s;
+      if (s === 'failed' || s === 'closed') {
+        this.authed = false;
+        if (s === 'failed') this.err = 'A conexão caiu ou não fechou. A rede pode estar bloqueando (celular com CGNAT, firewall, Wi-Fi de visitantes). Tente a opção STUN, outra rede, ou gere um convite novo.';
+      } else if (s === 'connected' && this.verified && !this.stale && this.dc && this.dc.readyState === 'open') {
+        this.authed = true;
+        if (!this.connectedAt) this.connectedAt = Date.now();
+      }
+      if (s === 'connected' && !this.err) this.err = '';
+      keepAwake(); renderConns(); renderConvList(); renderChatHead();
+    });
+    // ▼▼▼ REFATORADO — B2: iceconnectionstatechange em tempo real
+    this.pc.addEventListener('iceconnectionstatechange', () => {
+      const s = this.pc.iceConnectionState;
+      this.iceState = s;
+      if (s === 'connected' || s === 'completed') {
+        if (this.err && /A conexão caiu/.test(this.err)) this.err = '';
+      } else if (s === 'failed') {
+        this.err = 'ICE falhou. A rede provavelmente bloqueia conexão direta. Tente STUN, outra rede, ou um convite novo.';
+      } else if (s === 'disconnected') {
+        // Estado transitório. O Chrome costuma recuperar sozinho em poucos segundos.
+        this.state = 'ICE instável (tentando recuperar)';
+      }
+      renderConns(); renderChatHead();
+    });
+    // ▲▲▲ REFATORADO
+    this.pc.addEventListener('datachannel', e => this.setup(e.channel));
+    conns.set(this.id, this);
+  }
+  setup(dc) {
+    this.dc = dc;
+    dc.addEventListener('open', () => {
+      // ▼▼▼ REFATORADO — B3: keep-alive simétrico (ping + pong) e health check
+      this.ka = setInterval(() => {
+        try { this.send({ k: 'ping', ts: Date.now() }); this.lastPing = Date.now(); } catch (e) {}
+      }, PING_INTERVAL_MS);
+      // Health check 8.2: sem resposta => "sem resposta" (recuperável); só encerra após STALE_CLOSE_MS
+      this.hc = setInterval(() => {
+        if (!this.verified || document.visibilityState === 'hidden') return;
+        const since = Date.now() - (this.lastPong || this.connectedAt || Date.now());
+        if (!this.stale && since > PONG_TIMEOUT_MS) {
+          this.stale = true; this.authed = false;
+          renderConns(); renderChatHead(); renderConvList();
+        } else if (this.stale && since > STALE_CLOSE_MS) {
+          this.err = 'Sem resposta do outro aparelho há mais de 10 minutos. A conexão foi encerrada. Gere um convite novo.';
+          try { this.dc && this.dc.close(); } catch (e) {}
+        }
+      }, HEALTH_CHECK_MS);
+      // ▲▲▲ REFATORADO
+      this.sendHello().catch(e => { this.err = e.message; renderConns(); });
+    });
+    dc.addEventListener('message', e => { const t = typeof e.data === 'string' ? e.data : ''; this.q = this.q.then(() => onFrame(this, t)).catch(err => { this.err = String(err && err.message || err); }); });
+    dc.addEventListener('close', () => { clearInterval(this.ka); clearInterval(this.hc); this.authed = false; this.state = 'fechado'; renderConns(); renderConvList(); renderChatHead(); });
+  }
+  async offer() { this.setup(this.pc.createDataChannel('sliteme8', { ordered: true })); await this.pc.setLocalDescription(await this.pc.createOffer()); await waitIce(this.pc); this.out = await packSignal(this.pc.localDescription); this.state = 'aguardando resposta'; return this.out; }
+  async accept(text) { const d = await unpackSignal(text, 'offer'); await this.pc.setRemoteDescription(d); await this.pc.setLocalDescription(await this.pc.createAnswer()); await waitIce(this.pc); this.out = await packSignal(this.pc.localDescription); this.state = 'aguardando conexão'; return this.out; }
+  async answer(text) { const d = await unpackSignal(text, 'answer'); await this.pc.setRemoteDescription(d); this.state = 'conectando'; }
+  async sendHello() {
+    const ts = Date.now(); const sig = await signStr(`hello|${V.name}|${V.pub.ecdh}|${V.pub.ecdsa}|${this.nonce}|${ts}`);
+    this.send({ k: 'hello', v: 8, name: V.name, e: V.pub.ecdh, s: V.pub.ecdsa, nonce: this.nonce, ts, sig });
+  }
+  send(o) { if (this.dc && this.dc.readyState === 'open') this.dc.send(JSON.stringify(o)); }
+  // ▼▼▼ REFATORADO — B1: close limpa todos os timers
+  close() {
+    clearInterval(this.ka); clearInterval(this.hc);
+    try { this.dc && this.dc.close(); } catch (e) {}
+    try { this.pc.close(); } catch (e) {}
+    this.authed = false;
+    conns.delete(this.id);
+  }
+  // ▲▲▲ REFATORADO
+}
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ REFATORADO — B3/B4: keepAwake consciente de handshake e ICE
+let wl = null;
+async function keepAwake() {
+  try {
+    const any = [...conns.values()].some(c => c.authed && c.dc && c.dc.readyState === 'open');
+    if (any && !wl && navigator.wakeLock) {
+      wl = await navigator.wakeLock.request('screen');
+      wl.addEventListener('release', () => { wl = null; });
+    } else if (!any && wl) {
+      try { await wl.release(); } catch (e) {}
+      wl = null;
+    }
+  } catch (e) { wl = null; }
+}
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ REFATORADO — B5: visibilitychange reforçado
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible') {
+    touch();
+    // Ao voltar do background: dá um prazo de graça e pede sinal imediato
+    for (const c of [...conns.values()]) {
+      if (c.pc && (c.pc.connectionState === 'failed' || c.pc.connectionState === 'closed' || c.pc.iceConnectionState === 'failed')) {
+        c.authed = false;
+      } else if (c.verified && c.dc && c.dc.readyState === 'open') {
+        if (!c.stale) c.lastPong = Date.now();
+        c.lastPing = Date.now();
+        c.send({ k: 'ping', ts: c.lastPing });
+      }
+    }
+    await keepAwake();
+    renderConns(); renderChatHead(); renderConvList();
+  }
+});
+// ▲▲▲ REFATORADO
+
+function closeAllConns() { [...conns.values()].forEach(c => c.close()); renderConns(); }
+const connFor = fp => [...conns.values()].find(c => c.authed && c.remote && c.remote.fp === fp && c.dc && c.dc.readyState === 'open') || null;
+
+async function buildDM(contact, id, ts, body) {
+  const salt = rnd(16), key = await dmKey(V.ecdh, contact.ecdh, salt), e = await seal(key, body, `${V.fp}|${contact.fp}|${id}|${ts}`);
+  return { k: 'dm', id, ts, from: V.fp, to: contact.fp, salt: b64e(salt), iv: e.iv, ct: e.ct, sig: await signStr(`dm|${id}|${ts}|${V.fp}|${contact.fp}|${e.iv}|${e.ct}`) };
+}
+async function buildCirc(c, id, ts, body) {
+  const e = await seal(circKeys.get(c.id), body, `${c.id}|${V.fp}|${id}|${ts}`);
+  return { k: 'circ', id, ts, cid: c.id, from: V.fp, n: V.name, e: V.pub.ecdh, s: V.pub.ecdsa, iv: e.iv, ct: e.ct, sig: await signStr(`circ|${id}|${ts}|${c.id}|${V.fp}|${e.iv}|${e.ct}`) };
+}
+function waitBuffer(dc) {
+  if (dc.bufferedAmount < (1 << 20)) return Promise.resolve();
+  return new Promise(res => { dc.bufferedAmountLowThreshold = 1 << 18; const f = () => { dc.removeEventListener('bufferedamountlow', f); dc.removeEventListener('close', f); res(); }; dc.addEventListener('bufferedamountlow', f); dc.addEventListener('close', f); });
+}
+
+// ▼▼▼ REFATORADO — B6: streamChunks marca falha em vez de retornar silenciosamente
+async function streamChunks(conn, body, only) {
+  if (conn.sending.has(body.fid)) return;
+  conn.sending.add(body.fid);
+  try {
+    const kf = await aesRaw(b64d(body.kf), ['encrypt']);
+    const idx = only || Array.from({ length: body.n }, (_, i) => i);
+    for (const i of idx) {
+      const u8 = await chunkGet(body.fid, i); if (!u8) throw new Error('Pedaço local ausente.');
+      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: chunkIV(body.fid, i), additionalData: encT.encode(`fchunk:${body.fid}:${i}`) }, kf, u8));
+      await waitBuffer(conn.dc);
+      if (!conn.dc || conn.dc.readyState !== 'open') throw new Error('Conexão caiu durante o envio do arquivo.');
+      conn.send({ k: 'chunk', fid: body.fid, i, ct: b64e(ct) });
+    }
+  } finally { conn.sending.delete(body.fid); }
+}
+// ▲▲▲ REFATORADO
+
+async function transmitDM(conn, m) {
+  const contact = await getContact(conn.remote.fp); if (!contact) return;
+  conn.send(await buildDM(contact, m.id, m.ts, m.body));
+  if (m.body.fid) await streamChunks(conn, m.body);
+}
+async function flushPending(conn) {
+  for (const m of await msgList(conn.remote.fp)) if (m.dir === 'out' && m.st === 'pending') { try { await transmitDM(conn, m); } catch (e) {} }
+}
+async function sendToContact(fp, body) {
+  const m = { id: hex(rnd(12)), conv: fp, ts: Date.now(), dir: 'out', st: 'pending', body };
+  await msgPut(m); renderMsgs();
+  const c = connFor(fp); if (c) { try { await transmitDM(c, m); } catch (e) { notify('Falha no envio; ficou pendente.', 'error'); } }
+  return m;
+}
+async function sendToCircle(cid, body) {
+  const c = (await listCircles()).find(x => x.id === cid); if (!c) throw new Error('Círculo não encontrado.');
+  const m = { id: hex(rnd(12)), conv: cid, ts: Date.now(), dir: 'out', st: 'sent', body: { ...body, from: V.fp, fromName: V.name } };
+  await msgPut(m); renderMsgs();
+  const fr = await buildCirc(c, m.id, m.ts, body); conns.forEach(cn => { if (cn.authed) cn.send(fr); });
+  return m;
+}
+// ▼▼▼ 8.2 — recepção de arquivo retomável
+async function ensureInbound(conn, msgId, body) {
+  const old = inbound.get(body.fid);
+  if (old) { old.last = Date.now(); return old; }
+  const prefix = body.fid + ':', got = new Set();
+  const keys = await run('chunks', 'readonly', t => t.objectStore('chunks').getAllKeys(IDBKeyRange.bound(prefix, prefix + '\uFFFF')));
+  keys.forEach(k => { if (typeof k === 'string') got.add(Number(k.slice(prefix.length))); });
+  if (got.size >= body.n) { await msgBody(msgId, b => { b.done = true; delete b.failed; }); return null; }
+  const ib = { key: await aesRaw(b64d(body.kf), ['decrypt']), n: body.n, got, msg: msgId, from: conn.remote.fp, last: Date.now() };
+  inbound.set(body.fid, ib);
+  if (body.failed) await msgBody(msgId, b => { delete b.failed; });
+  return ib;
+}
+async function requestMissingFiles(conn) {
+  for (const m of await msgList(conn.remote.fp)) {
+    if (m.dir !== 'in' || m.body.t !== 'file' || m.body.done) continue;
+    const ib = await ensureInbound(conn, m.id, m.body); if (!ib) continue;
+    const miss = []; for (let i = 0; i < ib.n; i++) if (!ib.got.has(i)) miss.push(i);
+    if (miss.length) conn.send({ k: 'want', fid: m.body.fid, miss });
+  }
+  renderMsgs();
+}
+// ▲▲▲ 8.2
+
+async function onFrame(conn, txt) {
+  if (!V || txt.length > 1500000) return;
+  let f; try { f = JSON.parse(txt); } catch (e) { return; }
+  if (!f || typeof f.k !== 'string') return;
+  if (f.k === 'hello') {
+    if (conn.remote || f.v !== 8 || !isStr(f.name, 80) || !validPub(f.e) || !validPub(f.s) || !isStr(f.nonce, 40) || typeof f.ts !== 'number' || !isStr(f.sig, 200)) return;
+    if (!await verifyStr(f.s, `hello|${f.name}|${f.e}|${f.s}|${f.nonce}|${f.ts}`, f.sig)) { conn.err = 'Assinatura inválida'; return; }
+    const fp = await fpOf(f.e, f.s); if (fp === V.fp) { conn.err = 'Você conectou consigo mesmo.'; conn.close(); renderConns(); return; }
+    conn.remote = { name: cleanName(f.name) || 'Sem nome', fp, ecdh: f.e, ecdsa: f.s };
+    conn.send({ k: 'auth', sig: await signStr(`auth|${f.nonce}|${V.fp}|${fp}`) }); renderConns(); return;
+  }
+  if (f.k === 'auth') {
+    if (!conn.remote || conn.authed || !isStr(f.sig, 200)) return;
+    if (!await verifyStr(conn.remote.ecdsa, `auth|${conn.nonce}|${conn.remote.fp}|${V.fp}`, f.sig)) { conn.err = 'Autenticação falhou'; return; }
+    conn.verified = true; conn.stale = false; conn.authed = true; conn.state = 'connected'; conn.err = '';
+    if (!conn.connectedAt) conn.connectedAt = Date.now();
+    conn.lastPong = Date.now();
+    keepAwake();
+    const old = await getContact(conn.remote.fp);
+    await saveContact({ fp: conn.remote.fp, name: old ? old.name : conn.remote.name, ecdh: conn.remote.ecdh, ecdsa: conn.remote.ecdsa, verified: old ? old.verified : false, added: old ? old.added : Date.now() });
+    renderConns(); renderConvList(); renderChatHead();
+    flushPending(conn).catch(() => {}); requestMissingFiles(conn).catch(() => {});
+    return;
+  }
+  // ▼▼▼ 8.2 — sinais de vida (valem também quando a conexão está em "sem resposta")
+  if (f.k === 'ping' || f.k === 'pong') {
+    if (!conn.verified) return;
+    if (f.k === 'ping') conn.send({ k: 'pong', ts: f.ts });
+    conn.lastPong = Date.now();
+    if (conn.stale && conn.dc && conn.dc.readyState === 'open' && conn.pc.connectionState !== 'failed' && conn.pc.connectionState !== 'closed') {
+      conn.stale = false; conn.authed = true; conn.err = '';
+      keepAwake(); renderConns(); renderChatHead(); renderConvList();
+      flushPending(conn).catch(() => {}); requestMissingFiles(conn).catch(() => {});
+    }
+    return;
+  }
+  // ▲▲▲ 8.2
+  if (!conn.authed) return;
+  if (f.k === 'dm') {
+    if (!isStr(f.id, 40) || !/^[0-9a-f]+$/.test(f.id) || f.from !== conn.remote.fp || f.to !== V.fp || typeof f.ts !== 'number' || !isStr(f.salt, 40) || !isStr(f.iv, 40) || typeof f.ct !== 'string' || !isStr(f.sig, 200)) return;
+    if (!await verifyStr(conn.remote.ecdsa, `dm|${f.id}|${f.ts}|${f.from}|${f.to}|${f.iv}|${f.ct}`, f.sig)) return;
+    let body; try { body = await open(await dmKey(V.ecdh, conn.remote.ecdh, b64d(f.salt)), { iv: f.iv, ct: f.ct }, `${f.from}|${f.to}|${f.id}|${f.ts}`); } catch (e) { return; }
+    body = sanitizeBody(body); if (!body) return;
+    if (!await msgGet(f.id)) await msgPut({ id: f.id, conv: conn.remote.fp, ts: Math.min(f.ts, Date.now()), dir: 'in', st: 'recv', body });
+    if (body.fid) { const m = await msgGet(f.id); if (m && !m.body.done) await ensureInbound(conn, f.id, m.body); }
+    conn.send({ k: 'ack', id: f.id }); renderMsgs(); return;
+  }
+  if (f.k === 'ack') { if (isStr(f.id, 40)) { const m = await msgGet(f.id); if (m && m.dir === 'out' && m.conv === conn.remote.fp) { await msgState(f.id, 'sent'); renderMsgs(); } } return; }
+  if (f.k === 'want') {
+    if (typeof f.fid !== 'string' || !/^[0-9a-f]{16}$/.test(f.fid) || !Array.isArray(f.miss) || f.miss.length > 8192) return;
+    const m = (await msgList(conn.remote.fp)).find(x => x.dir === 'out' && x.body.t === 'file' && x.body.fid === f.fid); if (!m) return;
+    const miss = f.miss.filter(i => Number.isInteger(i) && i >= 0 && i < m.body.n); if (!miss.length) return;
+    streamChunks(conn, m.body, miss).catch(() => {});
+    return;
+  }
+  if (f.k === 'chunk') {
+    const ib = typeof f.fid === 'string' && inbound.get(f.fid); if (!ib || ib.from !== conn.remote.fp || !Number.isInteger(f.i) || f.i < 0 || f.i >= ib.n || typeof f.ct !== 'string') return;
+    let u8; try { u8 = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: chunkIV(f.fid, f.i), additionalData: encT.encode(`fchunk:${f.fid}:${f.i}`) }, ib.key, b64d(f.ct))); } catch (e) { return; }
+    ib.last = Date.now();
+    if (!ib.got.has(f.i)) {
+      const s = await sealBytes(V.store, u8, `chunk:${f.fid}:${f.i}`);
+      await dbPut('chunks', { k: `${f.fid}:${f.i}`, iv: s.iv, ct: s.ct });
+      ib.got.add(f.i);
+    }
+    if (ib.got.size === ib.n) { await msgBody(ib.msg, b => { b.done = true; }); inbound.delete(f.fid); }
+    if (ib.got.size === ib.n || f.i % 16 === 0) renderMsgs(); return;
+  }
+  if (f.k === 'circ') {
+    if (!isStr(f.id, 40) || !/^[0-9a-f]+$/.test(f.id) || !/^[0-9a-f]{16}$/.test(f.cid) || !circKeys.has(f.cid) || !isStr(f.n, 80) || !validPub(f.e) || !validPub(f.s) || typeof f.ts !== 'number' || !isStr(f.iv, 40) || typeof f.ct !== 'string' || !isStr(f.sig, 200)) return;
+    if (await msgGet(f.id)) return;
+    if (await fpOf(f.e, f.s) !== f.from) return;
+    if (!await verifyStr(f.s, `circ|${f.id}|${f.ts}|${f.cid}|${f.from}|${f.iv}|${f.ct}`, f.sig)) return;
+    let body; try { body = await open(circKeys.get(f.cid), { iv: f.iv, ct: f.ct }, `${f.cid}|${f.from}|${f.id}|${f.ts}`); } catch (e) { return; }
+    body = sanitizeBody(body, true); if (!body) return;
+    await msgPut({ id: f.id, conv: f.cid, ts: Math.min(f.ts, Date.now()), dir: 'in', st: 'recv', body: { ...body, from: f.from, fromName: cleanName(f.n) || 'Sem nome' } });
+    conns.forEach(cn => { if (cn !== conn && cn.authed) cn.send(f); }); renderMsgs();
+  }
+}
+function sanitizeBody(b, circle) {
+  if (!b || typeof b !== 'object') return null;
+  if (b.t === 'text') return isStr(b.x, 4000) ? { t: 'text', x: b.x } : null;
+  if (b.t === 'loc') return (Number.isFinite(b.lat) && Number.isFinite(b.lng) && Math.abs(b.lat) <= 90 && Math.abs(b.lng) <= 180) ? { t: 'loc', lat: b.lat, lng: b.lng } : null;
+  if (b.t === 'file' && !circle) return validFileBody(b) ? { t: 'file', fid: b.fid, kf: b.kf, n: b.n, size: b.size, name: safeFile(b.name), mime: b.mime, done: false } : null;
+  return null;
+}
+
+// ▼▼▼ 8.2 — limpeza de recepções sem atividade (o progresso fica salvo; volta ao reconectar)
+setInterval(() => {
+  const now = Date.now();
+  for (const [fid, ib] of inbound) {
+    if (now - (ib.last || 0) > INBOUND_TIMEOUT_MS) {
+      inbound.delete(fid);
+      if (V) msgBody(ib.msg, b => { if (!b.done) b.failed = true; }).then(() => renderMsgs()).catch(() => {});
+    }
+  }
+}, 60000);
+// ▲▲▲ REFATORADO
+
+// ============ INTERFACE ============
+let current = null; // {type:'dm'|'circle', id}
+const TABS = ['cofre', 'conn', 'conv', 'mural', 'local', 'backup', 'sobre'];
+function setTab(t) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  TABS.forEach(x => $('p-' + x).classList.toggle('active', x === t));
+}
+function setTheme(t) { document.documentElement.setAttribute('data-theme', t); $('btn-theme').textContent = t === 'dark' ? '☀️ Tema' : '🌙 Tema'; try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
+function renderAll() {
+  const has = !!vaultRec, open_ = !!V;
+  $('vault-new').hidden = has; $('vault-lock').hidden = !has || open_; $('vault-open').hidden = !open_;
+  ['conn', 'conv', 'mural', 'local', 'backup'].forEach(t => { const p = $('p-' + t); p.querySelector('.lockmsg').hidden = open_; p.querySelector('.body').hidden = !open_; });
+  if (open_) { $('o-name').textContent = V.name; $('o-fp').textContent = V.fp.slice(0, 16); $('me-card').value = cardOf(); }
+  else { $('me-card').value = ''; clear($('cv-list')); clear($('cv-msgs')); clear($('mu-list')); clear($('conn-list')); }
+  if (open_) { renderConns(); renderConvList(); renderChatHead(); renderMsgs(); renderMural(); }
+}
+// ▼▼▼ REFATORADO — B7: uptime + botão Renovar em renderConns
+function uptimeStr(ms) {
+  if (!ms || ms < 0) return '';
+  const s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60);
+  if (h) return h + ' h ' + (m % 60) + ' min';
+  if (m) return m + ' min ' + (s % 60) + ' s';
+  return s + ' s';
+}
+function renderConns() {
+  const box = $('conn-list'); if (!V) return;
+  // preserva o que a pessoa já digitou/colou e o foco
+  const keep = {}; box.querySelectorAll('textarea[data-role=in]').forEach(t => { keep[t.dataset.cid] = t.value; });
+  const ae = document.activeElement, focusCid = ae && ae.dataset && ae.dataset.role === 'in' && box.contains(ae) ? ae.dataset.cid : null;
+  const selS = focusCid ? ae.selectionStart : 0, selE = focusCid ? ae.selectionEnd : 0;
+  clear(box);
+  if (!conns.size) { box.append(h('div', { class: 'hint', text: 'Nenhuma conexão. Crie um convite ou aceite o de outra pessoa.' })); return; }
+  conns.forEach(c => {
+    const title = c.remote ? `${c.remote.name} · ${c.remote.fp.slice(0, 8)}` : (c.role === 'offer' ? 'Convite criado' : 'Convite recebido');
+    const up = c.connectedAt ? uptimeStr(Date.now() - c.connectedAt) : '';
+    const silent = c.lastPong ? Math.round((Date.now() - c.lastPong) / 1000) : 0;
+    const st = c.authed
+      ? h('span', { class: 'chip ok', text: '🟢 conectado' + (up ? ' · ' + up : '') })
+      : c.stale
+        ? h('span', { class: 'chip warn', text: '🟡 sem resposta há ' + uptimeStr(silent * 1000) })
+        : h('span', { class: 'chip', text: c.state + (c.iceState && c.iceState !== 'connected' && c.iceState !== 'completed' ? ' · ICE: ' + c.iceState : '') });
+    const actions = [];
+    if (c.authed || c.stale) actions.push(h('button', { class: 'sm sec', onclick: () => { c.send({ k: 'ping', ts: Date.now() }); c.lastPing = Date.now(); notify('Sinal enviado ao outro aparelho'); } }, '📡 Sinal'));
+    actions.push(h('button', { class: 'sm dng', onclick: () => { c.close(); renderConns(); renderConvList(); renderChatHead(); } }, 'Encerrar'));
+    const card = h('div', { class: 'fb' }, h('h4', null, h('span', { text: title }), h('span', null, st, ' ', ...actions)));
+    if (c.stale) card.append(h('div', { class: 'msg warn', text: 'O outro aparelho não responde. Pode estar com a tela apagada ou sem rede. Se ele voltar, a conversa continua sozinha; as mensagens ficam na fila.' }));
+    if (c.err) {
+      card.append(h('div', { class: 'msg err', text: c.err }));
+      card.append(h('div', { class: 'btns' }, h('button', { class: 'sm', onclick: () => { c.close(); renderConns(); setTimeout(() => ACTIONS['c-offer'](), 50); } }, '🔄 Encerrar e renovar convite')));
+    }
+    const ta = (extra) => h('textarea', { rows: 3, 'data-role': 'in', 'data-cid': String(c.id), ...extra });
+    if (c.role === 'offer' && !c.authed && !c.stale) {
+      card.append(h('label', { text: '1) Envie este convite à outra pessoa' }), h('textarea', { readOnly: true, rows: 3, value: c.out, 'data-role': 'out' }),
+        h('button', { class: 'sm sec', onclick: () => copyText(c.out, '📋 Convite copiado') }, 'Copiar convite'),
+        h('label', { text: '2) Cole aqui a resposta dela' }), ta(),
+        h('button', { class: 'sm', onclick: guard(async ev => { const t = ev.target.parentNode.querySelector('[data-role=in]'); await c.answer(t.value); renderConns(); }) }, 'Conectar'));
+    } else if (c.role === 'accept' && !c.authed && !c.stale) {
+      if (!c.out) card.append(h('label', { text: '1) Cole aqui o convite recebido' }), ta(),
+        h('button', { class: 'sm', onclick: guard(async ev => { const t = ev.target.parentNode.querySelector('[data-role=in]'); await c.accept(t.value); renderConns(); }) }, 'Gerar resposta'));
+      else card.append(h('label', { text: '2) Envie esta resposta de volta' }), h('textarea', { readOnly: true, rows: 3, value: c.out, 'data-role': 'out' }), h('button', { class: 'sm sec', onclick: () => copyText(c.out, '📋 Resposta copiada') }, 'Copiar resposta'), h('div', { class: 'hint', text: 'Aguarde: a conexão se completa sozinha.' }));
+    }
+    box.append(card);
+  });
+  box.querySelectorAll('textarea[data-role=in]').forEach(t => { if (keep[t.dataset.cid] != null) t.value = keep[t.dataset.cid]; });
+  if (focusCid) { const t = box.querySelector(`textarea[data-role=in][data-cid="${focusCid}"]`); if (t) { t.focus(); try { t.setSelectionRange(selS, selE); } catch (e) {} } }
+}
+// ▲▲▲ REFATORADO
+
+async function renderConvList() {
+  if (!V) return; const list = $('cv-list'); const contacts = await listContacts(), circles = await listCircles(); if (!V) return; clear(list);
+  contacts.forEach(c => list.append(h('button', { class: 'ci' + (current && current.type === 'dm' && current.id === c.fp ? ' active' : ''), onclick: () => openConv('dm', c.fp) }, h('span', { class: 'dot' + (connFor(c.fp) ? ' on' : '') }), c.name, c.verified ? ' ✔' : '')));
+  circles.forEach(c => list.append(h('button', { class: 'ci' + (current && current.type === 'circle' && current.id === c.id ? ' active' : ''), onclick: () => openConv('circle', c.id) }, '🛡️ ', c.name)));
+  if (!contacts.length && !circles.length) list.append(h('div', { class: 'hint', text: 'Sem contatos nem círculos.' }));
+}
+async function openConv(type, id) { current = { type, id }; $('cv-text').value = ''; await renderConvList(); await renderChatHead(); await renderMsgs(); }
+
+function renderBanner() {
+  const banner = $('cv-banner'); clear(banner);
+  if (!V || !current) return;
+  if (current.type === 'circle') { banner.append(h('div', { class: 'conn-banner warn' }, h('span', { text: 'Círculos: quem não estiver conectado agora não recebe depois.' }))); return; }
+  const fp = current.id, on = connFor(fp), mine = [...conns.values()].filter(x => x.remote && x.remote.fp === fp);
+  if (on) {
+    const up = on.connectedAt ? uptimeStr(Date.now() - on.connectedAt) : '';
+    const since = on.lastPong ? Math.round((Date.now() - on.lastPong) / 1000) : null;
+    banner.append(h('div', { class: 'conn-banner ok' },
+      h('span', { text: '🟢 Conexão ativa' + (up ? ' há ' + up : '') + (since != null ? ' · último sinal há ' + since + ' s' : '') }),
+      h('span', null,
+        h('button', { class: 'sm sec', onclick: () => { on.send({ k: 'ping', ts: Date.now() }); on.lastPing = Date.now(); notify('Sinal enviado'); } }, '📡'), ' ',
+        h('button', { class: 'sm dng', onclick: () => { if (!confirm('Encerrar esta conexão? Você pode gerar um convite novo depois.')) return; on.close(); renderConns(); renderChatHead(); renderConvList(); } }, 'Encerrar'))));
+    return;
+  }
+  const stale = mine.find(x => x.stale), failed = mine.find(x => x.err);
+  if (stale) banner.append(h('div', { class: 'conn-banner warn' }, h('span', { text: '🟡 O outro aparelho não responde. Se ele voltar, a conversa continua sozinha. Suas mensagens ficam na fila.' }),
+    h('span', null, h('button', { class: 'sm dng', onclick: () => { stale.close(); renderConns(); renderChatHead(); renderConvList(); } }, 'Encerrar'))));
+  else if (failed) banner.append(h('div', { class: 'conn-banner bad' }, h('span', { text: '🔴 ' + failed.err }),
+    h('span', null, h('button', { class: 'sm', onclick: () => { failed.close(); renderConns(); setTimeout(() => ACTIONS['c-offer'](), 50); } }, '🔄 Renovar convite'))));
+  else banner.append(h('div', { class: 'conn-banner warn' }, h('span', { text: '⚪ Sem conexão ativa. Suas mensagens ficam na fila e saem quando vocês reconectarem.' })));
+}
+async function renderChatHead() {
+  if (!V) return;
+  const cur = current;
+  ['cv-text', 'cv-send', 'cv-attach', 'cv-mic', 'cv-loc'].forEach(i => { $(i).disabled = !cur; });
+  let c = null, sn = '';
+  if (cur) {
+    if (cur.type === 'dm') { c = await getContact(cur.id); if (c) sn = await safetyNumber(V.fp, c.fp); }
+    else c = (await listCircles()).find(x => x.id === cur.id) || null;
+    if (!c) return;
+  }
+  if (!V || current !== cur) return;
+  const head = $('cv-head'), info = $('cv-info'); clear(info);
+  if (!cur) { head.textContent = 'Escolha um contato ou círculo.'; $('cv-note').textContent = ''; renderBanner(); return; }
+  if (cur.type === 'dm') {
+    const on = connFor(c.fp);
+    head.textContent = `${c.name} — ${on ? '🟢 conectado' : '⚪ offline (mensagens ficam pendentes)'}`;
+    info.append(h('div', { class: 'fb' }, h('div', { class: 'hint' }, 'Número de segurança (compare com a outra pessoa por outro meio): ', h('b', { text: sn })),
+      h('div', { class: 'btns' }, h('button', { class: 'sm sec', onclick: guard(async () => { c.verified = !c.verified; await saveContact(c); renderChatHead(); renderConvList(); }) }, c.verified ? '✔ Verificado (clique para desmarcar)' : 'Marcar como verificado'),
+        h('button', { class: 'sm dng', onclick: guard(async () => { if (!confirm('Apagar o contato e todas as mensagens desta conversa?')) return; await delConv(c.fp); await dbDel('contacts', c.fp); current = null; renderConvList(); renderChatHead(); renderMsgs(); }) }, 'Apagar contato'))));
+    $('cv-note').textContent = on ? '' : 'Sem conexão ativa: o envio fica na fila e sai quando conectarem de novo.';
+    $('cv-attach').disabled = false; $('cv-mic').disabled = false;
+  } else {
+    head.textContent = `🛡️ ${c.name} — enviado a todas as conexões abertas`;
+    info.append(h('div', { class: 'fb' }, h('label', { text: 'Convite do círculo (contém a chave; envie só a quem deve entrar)' }), h('textarea', { readOnly: true, rows: 3, value: inviteOf(c) }),
+      h('div', { class: 'btns' }, h('button', { class: 'sm sec', onclick: () => copyText(inviteOf(c), '📋 Convite copiado') }, 'Copiar convite'),
+        h('button', { class: 'sm dng', onclick: guard(async () => { if (!confirm('Sair do círculo e apagar as mensagens locais dele?')) return; await delConv(c.id); await dbDel('circles', c.id); circKeys.delete(c.id); current = null; renderConvList(); renderChatHead(); renderMsgs(); }) }, 'Sair do círculo'))));
+    $('cv-note').textContent = 'Círculos: texto e localização. Arquivos e áudio só em conversa direta.';
+    $('cv-attach').disabled = true; $('cv-mic').disabled = true;
+  }
+  renderBanner();
+}
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ REFATORADO — B7: renderMsgs preserva mídia em reprodução
+let objUrls = [];
+async function renderMsgs() {
+  if (!V) return; const box = $('cv-msgs'); const cur = current;
+  if (!cur) { clear(box); return; }
+  const msgs = (await msgList(cur.id)).slice(-200); if (!V || current !== cur) return;
+  // Preserva URLs em uso por mídia em execução
+  const used = new Set();
+  box.querySelectorAll('img,audio,video').forEach(el => {
+    if (el.tagName === 'AUDIO' || el.tagName === 'VIDEO') {
+      if (!el.paused && !el.ended) { used.add(el.src); el.dataset.persist = '1'; }
+    } else { used.add(el.src); el.dataset.persist = '1'; }
+  });
+  const keep = [];
+  objUrls.forEach(u => { if (used.has(u) || box.querySelector(`[data-persist][src="${u}"]`)) keep.push(u); else URL.revokeObjectURL(u); });
+  objUrls = keep;
+  clear(box);
+  if (!msgs.length) box.append(h('div', { class: 'hint', text: 'Sem mensagens.' }));
+  for (const m of msgs) box.append(msgNode(m));
+  box.scrollTop = box.scrollHeight;
+}
+// ▲▲▲ REFATORADO
+
+function msgNode(m) {
+  const b = m.body, d = h('div', { class: 'm ' + m.dir });
+  if (b.t === 'text') d.append(b.x);
+  else if (b.t === 'loc') {
+    const la = b.lat.toFixed(5), lo = b.lng.toFixed(5);
+    d.append('📍 ', h('a', { href: `https://www.openstreetmap.org/?mlat=${la}&mlon=${lo}#map=15/${la}/${lo}`, target: '_blank', rel: 'noopener noreferrer', text: `${la}, ${lo}` }), ' ', h('a', { href: `geo:${la},${lo}`, text: '(abrir no app de mapas)' }));
+  } else if (b.t === 'file') {
+    d.append(`📎 ${b.name} (${fmtBytes(b.size)}) `);
+    const btn = h('button', { class: 'sm sec', text: 'Abrir' }); d.append(btn);
+    if (m.dir === 'in' && !b.done && !b.failed) { btn.disabled = true; d.append(h('small', { text: 'recebendo… (mantenha a conexão aberta)' })); }
+    if (b.failed) { btn.disabled = true; d.append(h('small', { text: '⚠️ recepção interrompida (continua sozinha quando reconectarem)' })); }
+    btn.addEventListener('click', guard(async () => {
+      const { blob, inline } = await assembleFile(b), url = URL.createObjectURL(blob); objUrls.push(url);
+      if (inline && b.mime.startsWith('image/')) d.append(h('img', { src: url, alt: b.name }));
+      else if (inline && b.mime.startsWith('audio/')) d.append(h('audio', { controls: true, src: url }));
+      else if (inline && b.mime.startsWith('video/')) d.append(h('video', { controls: true, src: url }));
+      else d.append(h('a', { href: url, download: safeFile(b.name), text: ' ⬇ Baixar' }));
+      btn.remove();
+    }));
+  }
+  const who = m.body.fromName && m.dir === 'in' ? m.body.fromName + ' · ' : '';
+  d.append(h('small', null, `${who}${new Date(m.ts).toLocaleString()}${m.dir === 'out' ? (m.st === 'pending' ? ' · ⏳ pendente' : ' · ✓ enviada') : ''}`));
+  return d;
+}
+async function renderMural() {
+  if (!V) return; const box = $('mu-list'); const rows = (await dbAll('mural')).reverse(); if (!V) return; clear(box);
+  if (!rows.length) box.append(h('div', { class: 'hint', text: 'Nenhuma nota.' }));
+  for (const r of rows) { try { const o = await open(V.store, r.enc, 'mural'); box.append(h('div', { class: 'post' }, mdRender(o.x), h('small', { class: 'hint', text: new Date(o.ts).toLocaleString() + ' ' }), h('button', { class: 'sm sec', onclick: guard(async () => { await dbDel('mural', r.id); renderMural(); }) }, 'Apagar'))); } catch (e) {} }
+}
+
+// ============ LOCALIZAÇÃO / MAPA ============
+let lastLoc = null, leafletMap = null;
+function getPosition() { return new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error('Sem geolocalização neste navegador.')); navigator.geolocation.getCurrentPosition(p => res(p), e => rej(new Error('Localização negada ou indisponível.')), { enableHighAccuracy: false, timeout: 15000 }); }); }
+async function getLocation() {
+  const p = await getPosition(), dec = parseInt($('lo-prec').value, 10), f = x => Number(x.toFixed(dec));
+  lastLoc = { lat: f(p.coords.latitude), lng: f(p.coords.longitude) };
+  const out = $('lo-out'); clear(out);
+  out.append(`Coordenadas: ${lastLoc.lat}, ${lastLoc.lng} · `, h('a', { href: `https://www.openstreetmap.org/?mlat=${lastLoc.lat}&mlon=${lastLoc.lng}#map=15/${lastLoc.lat}/${lastLoc.lng}`, target: '_blank', rel: 'noopener noreferrer', text: 'abrir no OpenStreetMap' }), ' · ', h('a', { href: `geo:${lastLoc.lat},${lastLoc.lng}`, text: 'app de mapas' }), ' ');
+  if (current) out.append(h('button', { class: 'sm', onclick: guard(sendLocation) }, 'Enviar na conversa atual'));
+  if (leafletMap) showOnMap();
+}
+async function sendLocation() {
+  if (!current) throw new Error('Abra uma conversa antes.'); if (!lastLoc) await getLocation();
+  const body = { t: 'loc', lat: lastLoc.lat, lng: lastLoc.lng };
+  if (current.type === 'dm') await sendToContact(current.id, body); else await sendToCircle(current.id, body);
+}
+function loadLeaflet() {
+  return new Promise((res, rej) => {
+    if (window.L) return res();
+    const css = h('link', { rel: 'stylesheet', href: LEAFLET.css, integrity: LEAFLET.cssSri, crossorigin: '' }), s = h('script', { src: LEAFLET.js, integrity: LEAFLET.jsSri, crossorigin: '' });
+    s.onload = () => res(); s.onerror = () => rej(new Error('Mapa indisponível (sem internet ou bloqueado). As coordenadas continuam funcionando.'));
+    document.head.append(css, s);
+  });
+}
+function showOnMap() {
+  const el = $('lo-map'); el.hidden = false; const c = lastLoc || { lat: -15.78, lng: -47.93 };
+  if (!leafletMap) { leafletMap = L.map(el); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(leafletMap); }
+  leafletMap.setView([c.lat, c.lng], lastLoc ? 15 : 4); if (lastLoc) L.marker([c.lat, c.lng]).addTo(leafletMap); setTimeout(() => leafletMap.invalidateSize(), 50);
+}
+
+// ============ ÁUDIO ============
+let rec = null;
+async function toggleMic() {
+  if (rec) { rec.mr.stop(); return; }
+  if (!current || current.type !== 'dm') throw new Error('Áudio só em conversa direta.');
+  if (!navigator.mediaDevices || typeof MediaRecorder === 'undefined') throw new Error('Gravação de áudio indisponível neste navegador.');
+  const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported(t));
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => { throw new Error('Microfone negado ou indisponível.'); });
+  const mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream), parts = [], target = current.id;
+  rec = { mr }; mr.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
+  mr.onstop = guard(async () => {
+    stream.getTracks().forEach(t => t.stop()); rec = null; $('cv-mic').textContent = '🎙️ Áudio';
+    const type = (mr.mimeType || mime || 'audio/webm').split(';')[0], blob = new Blob(parts, { type }); if (!blob.size) return;
+    const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+    await sendFile(new File([blob], `audio-${Date.now()}.${ext}`, { type }), target);
+  });
+  mr.start(); $('cv-mic').textContent = '⏹️ Parar e enviar';
+}
+async function sendFile(file, target) {
+  target = target || (current && current.type === 'dm' && current.id); if (!target) throw new Error('Abra uma conversa direta.');
+  const f = await storeLocalFile(file); await sendToContact(target, { t: 'file', fid: f.fid, kf: f.kf, n: f.n, size: f.size, name: f.name, mime: f.mime });
+}
+
+// ============ BACKUP, DIAGNÓSTICO, PÂNICO ============
+const b64Rec = r => ({ k: r.k, iv: b64e(r.iv), ct: b64e(r.ct) });
+async function exportBackup(media = true) {
+  const data = { v: 8, meta: vaultRec, contacts: await dbAll('contacts'), circles: await dbAll('circles'), msgs: await dbAll('msgs'), mural: await dbAll('mural'), chunks: media ? (await dbAll('chunks')).map(b64Rec) : [] };
+  const e = await seal(V.backup, data, 'backup');
+  return new Blob([JSON.stringify({ app: 'sliteme', v: 8, salt: vaultRec.salt, iter: vaultRec.iter, iv: e.iv, ct: e.ct })], { type: 'application/octet-stream' });
+}
+async function restoreBackup(text, phrase, pin) {
+  let o; try { o = JSON.parse(text); } catch (e) { throw new Error('Arquivo de backup ilegível.'); }
+  if (!o || o.app !== 'sliteme' || o.v !== 8 || !isStr(o.salt, 64) || !Number.isInteger(o.iter) || o.iter < 1000 || o.iter > 5000000) throw new Error('Não é um backup do Sliteme 8.');
+  const err = await checkPhrase(phrase); if (err) throw new Error(err);
+  const keys = await deriveKeys(phrase, pin, b64d(o.salt), o.iter);
+  let d; try { d = await open(keys.backup, { iv: o.iv, ct: o.ct }, 'backup'); } catch (e) { throw new Error('Frase-chave ou PIN do backup incorretos.'); }
+  if (!d || d.v !== 8 || !d.meta || d.meta.id !== 'vault') throw new Error('Backup inválido.');
+  closeAllConns(); V = null; circKeys = new Map(); current = null;
+  await dbClearAll();
+  await run(['meta', 'contacts', 'circles', 'msgs', 'chunks', 'mural'], 'readwrite', t => {
+    t.objectStore('meta').put(d.meta);
+    (d.contacts || []).forEach(r => t.objectStore('contacts').put(r)); (d.circles || []).forEach(r => t.objectStore('circles').put(r));
+    (d.msgs || []).forEach(r => t.objectStore('msgs').put(r)); (d.mural || []).forEach(r => t.objectStore('mural').put(r));
+    (d.chunks || []).forEach(r => t.objectStore('chunks').put({ k: r.k, iv: b64d(r.iv), ct: b64d(r.ct) }));
+  });
+  vaultRec = d.meta; await unlockVault(phrase, pin);
+}
+async function diagnose() {
+  const out = $('dg-out'); clear(out); const rows = [];
+  const add = (n, ok, extra) => rows.push([n, ok ? '✅' : '❌', extra || '']);
+  add('Contexto seguro (HTTPS ou arquivo local)', window.isSecureContext, location.protocol);
+  add('WebCrypto', !!(window.crypto && crypto.subtle)); add('IndexedDB', !!window.indexedDB); add('WebRTC', typeof RTCPeerConnection !== 'undefined');
+  const mt = typeof MediaRecorder !== 'undefined' ? ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].filter(t => MediaRecorder.isTypeSupported(t)) : [];
+  add('Gravação de áudio', mt.length > 0, mt.join(', ') || 'indisponível'); add('Geolocalização', !!navigator.geolocation);
+  try { const e = await navigator.storage.estimate(); add('Armazenamento', true, `${fmtBytes(e.usage || 0)} usados de ${fmtBytes(e.quota || 0)}`); const p = await navigator.storage.persisted(); rows.push(['Armazenamento persistente', p ? '✅' : '⚠️', p ? '' : 'o navegador pode apagar os dados se faltar espaço (no Safari, após 7 dias sem uso)']); } catch (e) { add('Armazenamento', false, 'sem estimativa'); }
+  add('Contatos / círculos / mensagens / notas', true, `${await dbCount('contacts')} / ${await dbCount('circles')} / ${await dbCount('msgs')} / ${await dbCount('mural')}`);
+  // Diagnóstico estendido 8.1
+  add('Wake Lock (tela acesa durante conversa)', !!navigator.wakeLock, navigator.wakeLock ? 'disponível' : 'indisponível (o celular pode dormir e cair a conexão)');
+  add('Conexões ativas', true, String(conns.size));
+  const authedCount = [...conns.values()].filter(c => c.authed).length;
+  rows.push(['Conexões autenticadas', authedCount > 0 ? '✅' : 'ℹ️', String(authedCount)]);
+  const tests = await selfTest(); tests.forEach(t => add('Teste: ' + t[0], t[1]));
+  out.append(h('div', { class: 'scroll' }, h('table', null, h('thead', null, h('tr', null, h('th', { text: 'Item' }), h('th', { text: '' }), h('th', { text: 'Detalhe' }))), h('tbody', null, rows.map(r => h('tr', null, h('td', { text: r[0] }), h('td', { text: r[1] }), h('td', { text: r[2] })))))));
+}
+async function selfTest() {
+  const r = [];
+  try { const k = await aesRaw(rnd(32)); const e = await seal(k, { a: 1 }, 'x'); r.push(['cifra AES-GCM ida e volta', (await open(k, e, 'x')).a === 1]); let bad = false; try { await open(k, e, 'y'); } catch (x) { bad = true; } r.push(['dado autenticado (AAD errada é rejeitada)', bad]); } catch (e) { r.push(['cifra AES-GCM', false]); }
+  try { const a = await newIdentity(), b = await newIdentity(); const ka = await crypto.subtle.importKey('jwk', a.ecdhJwk, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']), kb = await crypto.subtle.importKey('jwk', b.ecdhJwk, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']); const s = rnd(16), k1 = await dmKey(ka, b.pubs.ecdh, s), k2 = await dmKey(kb, a.pubs.ecdh, s); const e = await seal(k1, { ok: 1 }, 'z'); r.push(['acordo de chaves ECDH entre dois pares', (await open(k2, e, 'z')).ok === 1]); } catch (e) { r.push(['acordo de chaves ECDH', false]); }
+  try { const f = mdRender('<img src=x onerror=alert(1)> [x](javascript:alert(1)) javascript:alert(1) **ok**'), tmp = h('div', null, f); r.push(['renderizador do mural bloqueia HTML e links perigosos', !tmp.querySelector('img,script,iframe') && ![...tmp.querySelectorAll('a')].some(a => !/^https?:/.test(a.href))]); } catch (e) { r.push(['renderizador do mural', false]); }
+  return r;
+}
+async function wipeAll(reload = true) {
+  closeAllConns(); V = null; vaultRec = null; circKeys = new Map(); current = null; inbound.clear();
+  try { if (db) { await dbClearAll(); db.close(); db = null; } } catch (e) {}
+  await new Promise(res => { try { const r = indexedDB.deleteDatabase(DB_NAME); r.onsuccess = r.onerror = r.onblocked = () => res(); setTimeout(res, 1500); } catch (e) { res(); } });
+  try { localStorage.removeItem(THEME_KEY); } catch (e) {}
+  if (reload) location.reload();
+}
+
+// ============ AÇÕES ============
+const ACTIONS = {
+  theme: () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'),
+  'copy-pix': () => copyText(PIX, '📋 Chave Pix copiada'),
+  'v-gen': guard(async () => { $('v-phrase').textContent = await genPhrase(); $('v-phrase-box').hidden = false; }),
+  'v-create': guard(async () => {
+    const pin = $('v-pin').value; if (pin !== $('v-pin2').value) throw new Error('Os PINs não conferem.');
+    $('v-create').disabled = true; notify('Criando cofre… (alguns segundos)');
+    try { await createVault($('v-name').value, pin, $('v-phrase').textContent); } finally { $('v-create').disabled = !$('v-ack').checked; }
+    $('v-pin').value = $('v-pin2').value = ''; $('v-phrase').textContent = ''; $('v-phrase-box').hidden = true; $('v-ack').checked = false; renderAll(); notify('✅ Cofre criado', 'success');
+  }),
+  unlock: guard(async () => {
+    const err = await checkPhrase($('u-phrase').value); const m = $('u-msg'); clear(m);
+    if (err) { m.append(h('div', { class: 'msg err', text: err })); return; }
+    $('u-go').disabled = true; try { await unlockVault($('u-phrase').value, $('u-pin').value); } catch (e) { m.append(h('div', { class: 'msg err', text: e.message })); return; } finally { $('u-go').disabled = false; }
+    $('u-phrase').value = $('u-pin').value = ''; renderAll(); notify('🔓 Cofre aberto', 'success');
+  }),
+  lock: () => lockVault(),
+  panic: guard(async () => { if (!confirm('PÂNICO: apagar todas as conversas, chaves e arquivos deste aparelho? Isso não tem volta.')) return; await wipeAll(true); }),
+  'copy-card': () => copyText($('me-card').value, '📋 Cartão copiado'),
+  'c-offer': guard(async () => { const c = new Conn('offer'); renderConns(); try { await c.offer(); } catch (e) { c.close(); throw e; } renderConns(); }),
+  'c-accept': guard(async () => { new Conn('accept'); renderConns(); }),
+  'ct-add': guard(async () => { const fp = await addContactCard($('ct-in').value); $('ct-in').value = ''; await renderConvList(); notify('✅ Contato adicionado', 'success'); openConv('dm', fp); }),
+  'ci-new': guard(async () => { const id = await newCircle($('ci-name').value); $('ci-name').value = ''; await openConv('circle', id); }),
+  'ci-join': guard(async () => { const id = await joinCircle($('ci-join').value); $('ci-join').value = ''; await openConv('circle', id); }),
+  'cv-send': guard(async () => {
+    const x = $('cv-text').value.trim(); if (!x || !current) return; $('cv-text').value = '';
+    const body = { t: 'text', x: x.slice(0, 4000) }; if (current.type === 'dm') await sendToContact(current.id, body); else await sendToCircle(current.id, body);
+  }),
+  'cv-attach': () => $('cv-file').click(),
+  'cv-mic': guard(toggleMic),
+  'cv-loc': guard(sendLocation),
+  'mu-post': guard(async () => { const x = $('mu-in').value.trim(); if (!x) return; await dbPut('mural', { ts: Date.now(), enc: await seal(V.store, { x, ts: Date.now() }, 'mural') }); $('mu-in').value = ''; renderMural(); }),
+  'lo-get': guard(getLocation),
+  'lo-map': guard(async () => { await loadLeaflet(); showOnMap(); }),
+  'bk-exp': guard(async () => { const b = await exportBackup($('bk-media').checked), a = h('a', { href: URL.createObjectURL(b), download: `sliteme8-backup-${Date.now()}.slm8` }); document.body.append(a); a.click(); a.remove(); notify('✅ Backup exportado', 'success'); }),
+  'dg-run': guard(diagnose),
+  'dg-persist': guard(async () => { const ok = navigator.storage && navigator.storage.persist ? await navigator.storage.persist() : false; notify(ok ? '✅ Armazenamento persistente concedido' : 'O navegador não concedeu (instale na tela inicial ou use o site com frequência)', ok ? 'success' : 'error'); }),
+  restore: guard(() => doRestore('r-file', 'r-phrase', 'r-pin')), restore2: guard(() => doRestore('r2-file', 'r2-phrase', 'r2-pin'))
+};
+async function doRestore(fi, pi, ni) {
+  const f = $(fi).files[0]; if (!f) throw new Error('Escolha o arquivo de backup.');
+  if (vaultRec && !confirm('Isto SUBSTITUI o cofre atual deste aparelho pelo do backup. Continuar?')) return;
+  await restoreBackup(await f.text(), $(pi).value, $(ni).value); $(pi).value = $(ni).value = ''; renderAll(); notify('✅ Backup restaurado', 'success');
+}
+
+// ▼▼▼ REFATORADO — B4/B5: eventos estendidos de touch
+document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b && ACTIONS[b.dataset.act]) ACTIONS[b.dataset.act](e); const t = e.target.closest('.tab'); if (t) setTab(t.dataset.tab); touch(); });
+document.addEventListener('keydown', e => { touch(); if (e.key === 'Enter' && e.target.id === 'cv-text') { e.preventDefault(); ACTIONS['cv-send'](); } });
+document.addEventListener('pointerdown', touch, { passive: true });
+document.addEventListener('mousemove', (() => { let last = 0; return () => { const n = Date.now(); if (n - last > 30000) { last = n; touch(); } }; })(), { passive: true });
+// ▲▲▲ REFATORADO
+
+$('v-ack').addEventListener('change', () => { $('v-create').disabled = !$('v-ack').checked; });
+$('ice-mode').addEventListener('change', () => { $('ice-custom').hidden = $('ice-mode').value !== 'custom'; });
+$('cv-file').addEventListener('change', guard(async () => { const f = $('cv-file').files[0]; $('cv-file').value = ''; if (f) await sendFile(f); }));
+
+// ▼▼▼ REFATORADO — I6: pagehide só fecha em destruição real
+window.addEventListener('pagehide', (e) => {
+  if (e.persisted) return; // bfcache: NÃO fechar, a página volta
+  closeAllConns();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    // Voltou do bfcache: re-renderiza e checa saúde
+    touch();
+    renderConns(); renderChatHead(); renderConvList();
+    keepAwake();
+  }
+});
+// ▲▲▲ REFATORADO
+
+// ▼▼▼ 8.2 — atualiza tempos a cada 10 s sem destruir o que a pessoa está digitando
+setInterval(() => {
+  if (document.visibilityState !== 'visible' || !V || conns.size === 0) return;
+  const ae = document.activeElement, typing = ae && ae.tagName === 'TEXTAREA' && ae.dataset && ae.dataset.role === 'in';
+  const pConn = $('p-conn');
+  if (pConn && pConn.classList.contains('active') && !typing) renderConns();
+  renderBanner();
+}, 10000);
+// ▲▲▲ REFATORADO
+
+// ============ INIT ============
+(async function init() {
+  let t = 'light'; try { t = localStorage.getItem(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (e) {}
+  setTheme(t); $('foot-txt').textContent = FOOTER_TEXT;
+  try { await openDB(); vaultRec = await dbGet('meta', 'vault') || null; } catch (e) { notify('❌ ' + e.message, 'error'); }
+  renderAll();
+})();
+</script>
+</body>
+</html>
